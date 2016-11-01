@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">MMA TODAY</string>
+    <string name="action_settings">Settings</string>
+    <string-array name="men_weightclass_array">
+        <item>Flyweight</item>
+        <item>Bantamweight</item>
+        <item>Featherweight</item>
+        <item>Lightweight</item>
+        <item>Welterweight</item>
+        <item>Middleweight</item>
+        <item>Light Heavyweight</item>
+        <item>Heavyweight</item>
+    </string-array>
+    <string-array name="women_weightclass_array">
+        <item>Women Strawweight"</item>
+        <item>Women Bantamweight</item>
+    </string-array>
+</resources>
