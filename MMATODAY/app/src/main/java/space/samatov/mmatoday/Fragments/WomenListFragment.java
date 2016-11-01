@@ -8,6 +8,8 @@ import samatov.space.mmatoday.R;
 import space.samatov.mmatoday.model.Sorter;
 
 public class WomenListFragment extends List_Fragment {
+
+    public static final String FRAGMENT_KEY="women_list_fragment";
     @Override
     public void setupList() {
         mFighters= Sorter.getGender(Sorter.GENDER_WOMEN,mFighters);

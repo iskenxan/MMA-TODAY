@@ -87,6 +87,7 @@ public  class Database  {
                         continue;
                     }
                     fighter.setProfileUrl(jsonObject.getString("profile_image"));
+                    fighter.setFullBodyUrl(jsonObject.getString("left_full_body_image"));
                     fighter.setId(jsonObject.getInt("id"));
                     fighter.setPFP(jsonObject.getString("pound_for_pound_rank"));
                     if(fighter.getPFP()==null)

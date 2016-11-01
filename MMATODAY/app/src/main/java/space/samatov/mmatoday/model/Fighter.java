@@ -11,6 +11,7 @@ public class Fighter implements Parcelable,ListItem {
     private int mId;
     private String mProfileUrl;
     private String mBeltProfileUrl="";
+    private String mFullBodyUrl="";
     private String mPFP;
     private boolean mTitleHolder;
     private int mWins;
@@ -121,6 +122,14 @@ public class Fighter implements Parcelable,ListItem {
 
     public void setmBeltProfileUrl(String mBeltProfileUrl) {
         this.mBeltProfileUrl = mBeltProfileUrl;
+    }
+
+    public String getFullBodyUrl() {
+        return mFullBodyUrl;
+    }
+
+    public void setFullBodyUrl(String mFullBodyUrl) {
+        this.mFullBodyUrl = mFullBodyUrl;
     }
 
     //**********Parcelable*************
