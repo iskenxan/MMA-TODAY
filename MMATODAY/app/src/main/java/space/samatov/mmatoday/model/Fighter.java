@@ -17,7 +17,7 @@ public class Fighter implements Parcelable,ListItem {
     private int mWins;
     private int mLosses;
     private int mDraws;
-
+    private long mFighterId;
     public Fighter(){
 
     }
@@ -122,6 +122,14 @@ public class Fighter implements Parcelable,ListItem {
 
     public void setmBeltProfileUrl(String mBeltProfileUrl) {
         this.mBeltProfileUrl = mBeltProfileUrl;
+    }
+
+    public long getFighterId() {
+        return mFighterId;
+    }
+
+    public void setFighterId(long mFighterId) {
+        this.mFighterId = mFighterId;
     }
 
     public String getFullBodyUrl() {

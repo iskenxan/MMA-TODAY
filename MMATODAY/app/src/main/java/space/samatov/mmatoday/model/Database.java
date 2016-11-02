@@ -1,6 +1,7 @@
 package space.samatov.mmatoday.model;
 
 
+import android.os.AsyncTask;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
@@ -8,6 +9,10 @@ import android.util.Log;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -19,7 +24,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public  class Database  {
-    private String mFightersUrl="http://ufc-data-api.ufc.com/api/v3/iphone/fighters";
+    private static String mFightersUrl="http://ufc-data-api.ufc.com/api/v3/iphone/fighters";
     public ArrayList<Fighter> mFighters;
 
 
@@ -53,6 +58,39 @@ public  class Database  {
                 NotifyListeners(false);
             }
         });
+    }
+
+    public  void readFighterStatsHtml(FighterStats stats){
+        JsoupReader reader=new JsoupReader();
+        reader.execute(stats);
+    }
+
+    private static class JsoupReader extends AsyncTask<FighterStats,Void,Document>{
+
+
+        @Override
+        protected Document doInBackground(FighterStats... fighterStatses) {
+            FighterStats stats=fighterStatses[0];
+            String url=mFightersUrl+"/"+stats.getmFighterId();
+            Document document=new Document(url);
+            try {
+                document=Jsoup.connect(url).get();
+
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return document;
+        }
+
+        @Override
+        protected void onPostExecute(Document document) {
+            FighterStats stats=new FighterStats();
+
+            Elements values=document.select("td");
+            Element from=values.get(1);
+            stats.setmFrom(from.text());
+        }
     }
 
     //Interface used to read JSon files from data each class that implements it , is used to extract different data from the item
@@ -93,6 +131,7 @@ public  class Database  {
                     if(fighter.getPFP()==null)
                         fighter.setPFP("none");
                     fighter.setTitleHolder(jsonObject.getBoolean("title_holder"));
+                    fighter.setFighterId(jsonObject.getLong("id"));
                     mFighters.add(fighter);
                 }
             } catch (JSONException e) {

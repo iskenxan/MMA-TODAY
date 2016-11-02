@@ -14,6 +14,7 @@ import space.samatov.mmatoday.Fragments.FighterDetailsFragment;
 import space.samatov.mmatoday.Fragments.List_Fragment;
 import space.samatov.mmatoday.Fragments.ViewPagerFragment;
 import space.samatov.mmatoday.model.Database;
+import space.samatov.mmatoday.model.FighterStats;
 import space.samatov.mmatoday.model.OnListItemClicked;
 
 public class MainActivity extends AppCompatActivity implements Database.DataListener,OnListItemClicked {
@@ -31,6 +32,9 @@ public class MainActivity extends AppCompatActivity implements Database.DataList
         mDatabase.getFightersData();
         else
             DisplayErrorMessage();
+        FighterStats stats=new FighterStats();
+        stats.setmFighterId(1161);
+        mDatabase.readFighterStatsHtml(stats);
     }
 
     public void startViewPagerFragment(){
