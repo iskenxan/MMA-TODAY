@@ -14,6 +14,7 @@ import space.samatov.mmatoday.Fragments.FighterDetailsFragment;
 import space.samatov.mmatoday.Fragments.List_Fragment;
 import space.samatov.mmatoday.Fragments.ViewPagerFragment;
 import space.samatov.mmatoday.model.Database;
+import space.samatov.mmatoday.model.Fighter;
 import space.samatov.mmatoday.model.FighterStats;
 import space.samatov.mmatoday.model.OnListItemClicked;
 
@@ -32,9 +33,6 @@ public class MainActivity extends AppCompatActivity implements Database.DataList
         mDatabase.getFightersData();
         else
             DisplayErrorMessage();
-        FighterStats stats=new FighterStats();
-        stats.setmFighterId(1161);
-        mDatabase.readFighterStatsHtml(stats);
     }
 
     public void startViewPagerFragment(){
@@ -80,12 +78,12 @@ public class MainActivity extends AppCompatActivity implements Database.DataList
     }
 
     @Override
-    public void OnListItemSelected(int position) {
+    public void OnListItemSelected(Fighter fighter) {
         FighterDetailsFragment fragment=new FighterDetailsFragment();
         FragmentManager fragmentManager=getSupportFragmentManager();
 
         Bundle args=new Bundle();
-        args.putInt("fighter_position",position);
+        args.putParcelable("fighter",fighter);
         fragment.setArguments(args);
         fragmentManager.beginTransaction().replace(R.id.mainPlaceholder,fragment,FighterDetailsFragment.FRAGMENT_KEY)
                 .addToBackStack(null).commit();

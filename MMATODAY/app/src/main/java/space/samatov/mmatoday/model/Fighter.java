@@ -8,7 +8,7 @@ public class Fighter implements Parcelable,ListItem {
     private String mLastName;
     private String mNickName;
     private String mWeightClass;
-    private int mId;
+    private String mCountryCode;
     private String mProfileUrl;
     private String mBeltProfileUrl="";
     private String mFullBodyUrl="";
@@ -17,7 +17,8 @@ public class Fighter implements Parcelable,ListItem {
     private int mWins;
     private int mLosses;
     private int mDraws;
-    private long mFighterId;
+    private int mId;
+    private int mStatId;
     public Fighter(){
 
     }
@@ -124,20 +125,28 @@ public class Fighter implements Parcelable,ListItem {
         this.mBeltProfileUrl = mBeltProfileUrl;
     }
 
-    public long getFighterId() {
-        return mFighterId;
-    }
-
-    public void setFighterId(long mFighterId) {
-        this.mFighterId = mFighterId;
-    }
-
     public String getFullBodyUrl() {
         return mFullBodyUrl;
     }
 
     public void setFullBodyUrl(String mFullBodyUrl) {
         this.mFullBodyUrl = mFullBodyUrl;
+    }
+
+    public String getCountryCode() {
+        return mCountryCode;
+    }
+
+    public int getmStatId() {
+        return mStatId;
+    }
+
+    public void setmStatId(int mStatId) {
+        this.mStatId = mStatId;
+    }
+
+    public void setCountryCode(String mCountryCode) {
+        this.mCountryCode = mCountryCode;
     }
 
     //**********Parcelable*************

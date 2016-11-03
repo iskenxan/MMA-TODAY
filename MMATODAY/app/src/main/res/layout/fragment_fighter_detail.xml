@@ -44,7 +44,7 @@
                 android:textColor="@android:color/white"
                 android:textSize="22sp"
                 android:gravity="center"
-                android:id="@+id/textView2" />
+                android:id="@+id/fDetailsFirstTextView" />
 
             <TextView
                 android:layout_width="match_parent"

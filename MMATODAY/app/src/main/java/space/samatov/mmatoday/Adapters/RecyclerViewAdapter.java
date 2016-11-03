@@ -56,9 +56,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter implements List_Fr
         return viewHolder;
     }
 
-    public void notifyListeners(int position){
+    public void notifyListeners(Fighter fighter){
         for (OnListItemClicked listener: mListeners){
-            listener.OnListItemSelected(position);
+            listener.OnListItemSelected(fighter);
         }
     }
 
@@ -170,7 +170,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter implements List_Fr
 
         @Override
         public void onClick(View view) {
-            notifyListeners(mIndex);
+            Fighter fighter= (Fighter) mFighters.get(mIndex);
+            notifyListeners(fighter);
         }
     }
 
@@ -200,7 +201,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter implements List_Fr
 
         @Override
         public void onClick(View view) {
-            notifyListeners(mIndex);
+            Fighter fighter= (Fighter) mFighters.get(mIndex);
+            notifyListeners(fighter);
         }
     }
 
