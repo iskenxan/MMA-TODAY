@@ -6,7 +6,8 @@
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:src="@drawable/johnson_d_left_full"/>
+        tools:src="@drawable/johnson_d_left_full"
+        android:id="@+id/backgroundImageView"/>
     <View
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -23,7 +24,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:id="@+id/nameLayout">
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="90dp"
@@ -31,7 +33,6 @@
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
             android:paddingTop="10dp"
-            android:id="@+id/nameLayout"
             android:layout_alignParentTop="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
@@ -50,19 +51,20 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                tools:text="Mighty Mouse"
-                android:textSize="24sp"
-                android:id="@+id/textView"
-                android:textColor="@color/colorAccent" />
-
+                tools:text="Johnson"
+                android:textColor="@android:color/white"
+                android:textSize="22sp"
+                android:gravity="center"
+                android:id="@+id/fDetailsLastTextView" />
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                tools:text="Johnson"
-                android:textColor="@android:color/white"
-                android:textSize="22sp"
-                android:gravity="center"/>
+                tools:text="The Messenger"
+                android:textSize="20sp"
+                android:id="@+id/fDetailsNickname"
+                android:textColor="@color/colorAccent"
+                android:gravity="center_horizontal"/>
         </LinearLayout>
         <LinearLayout
             android:layout_width="0dp"
@@ -73,15 +75,482 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                tools:text="24-20-10"
+                tools:text="W-L-D"
                 android:textColor="@android:color/white"
                 android:textSize="24sp"
                 android:gravity="center"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                tools:text="24-20-10"
+                android:textColor="@android:color/white"
+                android:textSize="24sp"
+                android:gravity="center"
+                android:id="@+id/fDetailsRecordsTextView"/>
         </LinearLayout>
         </LinearLayout>
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/detailsLayout"
+                android:layout_below="@+id/aboutHeadlineTextView"
+                android:orientation="vertical"
+                android:layout_marginTop="10dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginTop="5dp">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Age:"
+                        android:textColor="@android:color/white"
+                        android:textSize="17sp"
+                        android:gravity="center_horizontal"/>
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        tools:text="30"
+                        android:textColor="@android:color/white"
+                        android:textSize="17sp"
+                        android:gravity="center_horizontal"
+                        android:id="@+id/fDetailsAgeTextView"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginTop="5dp">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Weight Class:"
+                        android:textColor="@android:color/white"
+                        android:textSize="17sp"
+                        android:gravity="center_horizontal"/>
 
-    </RelativeLayout>
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        tools:text="FlyWeight"
+                        android:textColor="@android:color/white"
+                        android:textSize="17sp"
+                        android:gravity="center_horizontal"
+                        android:id="@+id/fDetailsWeightClassTextView" />
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginTop="5dp">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Weight:"
+                        android:textColor="@android:color/white"
+                        android:textSize="17sp"
+                        android:gravity="center_horizontal"/>
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        tools:text="135lbs"
+                        android:textColor="@android:color/white"
+                        android:textSize="17sp"
+                        android:gravity="center_horizontal"
+                        android:id="@+id/fDetailsWeightTextView"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginTop="5dp">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Height:"
+                        android:textColor="@android:color/white"
+                        android:textSize="17sp"
+                        android:gravity="center_horizontal"/>
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        tools:text="6.4"
+                        android:textColor="@android:color/white"
+                        android:textSize="17sp"
+                        android:gravity="center_horizontal"
+                        android:id="@+id/fDetailsHeightTextView"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginTop="5dp">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Team:"
+                        android:textColor="@android:color/white"
+                        android:textSize="17sp"
+                        android:gravity="center_horizontal"/>
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        tools:text="AMC Pankration"
+                        android:textColor="@android:color/white"
+                        android:textSize="17sp"
+                        android:gravity="center_horizontal"
+                        android:id="@+id/fDetailsTeamTextView"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginTop="5dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Out Of:"
+                        android:textColor="@android:color/white"
+                        android:textSize="17sp"
+                        android:gravity="center_horizontal"
+                        android:id="@+id/textView3" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        tools:text="Kirkland,WA"
+                        android:textColor="@android:color/white"
+                        android:textSize="17sp"
+                        android:gravity="center_horizontal"
+                        android:id="@+id/fDetailsOutOfTextView"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginTop="5dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Rank:"
+                        android:textColor="@android:color/white"
+                        android:textSize="17sp"
+                        android:gravity="center_horizontal" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        tools:text="#1 FlyWeight"
+                        android:textColor="@android:color/white"
+                        android:textSize="17sp"
+                        android:gravity="center_horizontal"
+                        android:id="@+id/fDetailsRankTextView"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginTop="5dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Pro. debut date:"
+                        android:textColor="@android:color/white"
+                        android:textSize="17sp"
+                        android:gravity="center_horizontal" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        tools:text="2007-04-28"
+                        android:textColor="@android:color/white"
+                        android:textSize="17sp"
+                        android:gravity="center_horizontal"
+                        android:id="@+id/fDetailsProfDebutTextView"/>
+                </LinearLayout>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:id="@+id/statsLayout"
+                android:layout_below="@+id/statsHeadlineTextView">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="SIGNIFICANT STRIKES"
+                    android:textColor="@android:color/white"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="5dp"
+                    android:textSize="18sp"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginTop="5dp">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Landed Per Min:"
+                        android:textColor="@android:color/white"
+                        android:gravity="center_horizontal"
+                        android:textSize="17sp"/>
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        tools:text="3.5"
+                        android:textColor="@android:color/white"
+                        android:gravity="center_horizontal"
+                        android:textSize="17sp"
+                        android:id="@+id/fDetailsSigStrikesLandedTextView"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginTop="5dp">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Accuracy:"
+                        android:textColor="@android:color/white"
+                        android:gravity="center_horizontal"
+                        android:textSize="17sp"/>
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        tools:text="50%"
+                        android:textColor="@android:color/white"
+                        android:gravity="center_horizontal"
+                        android:textSize="17sp"
+                        android:id="@+id/fDetailsStrikesAccuracyTextView"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginTop="5dp">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Absorbed Per Minute:"
+                        android:textColor="@android:color/white"
+                        android:gravity="center_horizontal"
+                        android:textSize="17sp"/>
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        tools:text="1.8"
+                        android:textColor="@android:color/white"
+                        android:gravity="center_horizontal"
+                        android:textSize="17sp"
+                        android:id="@+id/fDetailsStrikesAbsorbedTextView"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginTop="5dp">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Defence:"
+                        android:textColor="@android:color/white"
+                        android:gravity="center_horizontal"
+                        android:textSize="17sp"/>
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        tools:text="65%"
+                        android:textColor="@android:color/white"
+                        android:gravity="center_horizontal"
+                        android:textSize="17sp"
+                        android:id="@+id/fDetailsDefenceTextView"/>
+                </LinearLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="TAKEDOWNS"
+                    android:textColor="@android:color/white"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="5dp"
+                    android:textSize="18sp"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginTop="5dp">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Landed Per 15 Min: "
+                        android:textColor="@android:color/white"
+                        android:gravity="center_horizontal"
+                        android:textSize="17sp"/>
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        tools:text="65%"
+                        android:textColor="@android:color/white"
+                        android:gravity="center_horizontal"
+                        android:textSize="17sp"
+                        android:id="@+id/fDetailsTakedownsLandedTextView"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginTop="5dp">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Accuracy"
+                        android:textColor="@android:color/white"
+                        android:gravity="center_horizontal"
+                        android:textSize="17sp"/>
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        tools:text="65%"
+                        android:textColor="@android:color/white"
+                        android:gravity="center_horizontal"
+                        android:textSize="17sp"
+                        android:id="@+id/fDetailsTakedownsAccuracyTextView"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginTop="5dp">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Defence:"
+                        android:textColor="@android:color/white"
+                        android:gravity="center_horizontal"
+                        android:textSize="17sp"/>
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        tools:text="65%"
+                        android:textColor="@android:color/white"
+                        android:gravity="center_horizontal"
+                        android:textSize="17sp"
+                        android:id="@+id/fDetailstakedownsDefenceTextView"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginTop="5dp">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Submission Per 15 Min"
+                        android:textColor="@android:color/white"
+                        android:gravity="center_horizontal"
+                        android:textSize="17sp"/>
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        tools:text="65%"
+                        android:textColor="@android:color/white"
+                        android:gravity="center_horizontal"
+                        android:textSize="17sp"
+                        android:id="@+id/fDefenceSubmissionTextView"/>
+                </LinearLayout>
+            </LinearLayout>
+
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="ABOUT"
+                android:id="@+id/aboutHeadlineTextView"
+                android:gravity="center_horizontal"
+                android:textSize="25sp"
+                android:textColor="@color/colorAccent"
+                android:layout_marginTop="20dp"
+                android:layout_below="@+id/nameLayout"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="STATS"
+                android:id="@+id/statsHeadlineTextView"
+                android:gravity="center_horizontal"
+                android:textSize="25sp"
+                android:textColor="@color/colorAccent"
+                android:layout_marginTop="17dp"
+                android:layout_below="@+id/detailsLayout"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_marginBottom="10dp"/>
+        </RelativeLayout>
     </ScrollView>
 
 </FrameLayout>

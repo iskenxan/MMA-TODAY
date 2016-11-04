@@ -29,32 +29,26 @@ import okhttp3.Response;
 
 public  class Database  {
     private static String mFightersUrl="http://ufc-data-api.ufc.com/api/v3/iphone/fighters";
+    public static final String mFightMatrixSearchUrl="http://www.fightmatrix.com/fighter-search/?fName=";
+    public static final String mMixedMartialArtsSearchUrl="http://www.mixedmartialarts.com/fighter/search?search=";
 
     private int mCounter=0;
     public ArrayList<Fighter> mFighters;
 
 
     private ArrayList<DataListener> mListeners=new ArrayList<DataListener>();
-    private ArrayList<OnCountryCodeFoundListener> mCountryCodeListeners=new ArrayList<>();
+    private ArrayList<StaticDataListener> mStatsListener=new ArrayList<>();
 
     public void addListener(DataListener listener){
         mListeners.add(listener);
     }
-    public void addCountryCodeListener(OnCountryCodeFoundListener listener){
-        mCountryCodeListeners.add(listener);
-    }
+    public void addStatsListener(StaticDataListener listener){mStatsListener.add(listener);}
 
     public void getFightersData(){
         getData(mFightersUrl,new GetFigthersData());
     }
 
 
-
-    public  void getSpeficicCountryCode(Fighter fighter){
-        ArrayList<String> weightclasses=new ArrayList<String>(Arrays.asList(FighterStats.mWeightClasses));
-        ArrayList<String> countries=new ArrayList<String>(Arrays.asList(FighterStats.mCountries));
-        getData(FighterStats.mCountriesUrl+countries.remove(0),new FindSpecificCountryCode(fighter,countries,weightclasses));
-    }
 
     protected void getData(String url, final readJson method ) {
         final OkHttpClient client = new OkHttpClient();
@@ -82,44 +76,106 @@ public  class Database  {
         reader.execute(stats);
     }
 
-    private static class JsoupReader extends AsyncTask<FighterStats,Void,Document>{
+    private  class JsoupReader extends AsyncTask<FighterStats,Void,ArrayList<String>>{
 
 
         @Override
-        protected Document doInBackground(FighterStats... fighterStatses) {
+        protected ArrayList<String> doInBackground(FighterStats... fighterStatses) {
             FighterStats stats=fighterStatses[0];
-            String url=mFightersUrl+"/"+stats.getmFighterId();
-            Document document=new Document(url);
+            String mixedMarialArtsUrl=mMixedMartialArtsSearchUrl+stats.getmFirst()+"+"+stats.getmLast();
+            String fightMatrixUrl=mFightMatrixSearchUrl+stats.getmFirst()+"+"+stats.getmLast();
+            ArrayList<String > results=new ArrayList<>();
+            results.add(stats.getmFirst());
+            results.add(stats.getmLast());
             try {
-                document=Jsoup.connect(url).get();
-
+                results.addAll(getMarialArtsData(Jsoup.connect(mixedMarialArtsUrl).get()));
+                results.addAll(getFightMatrixData(Jsoup.connect(fightMatrixUrl).get()));
 
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            return document;
+            return results;
+        }
+
+        public ArrayList<String> getMarialArtsData(Document document) throws IOException{
+            ArrayList<String> stats=new ArrayList<>();
+            Elements infoTable=document.select("table.fighter-info");
+            try {
+                Elements age = infoTable.select("th:containsOwn(Age:)+td");
+                stats.add(age.text());
+                Elements height = infoTable.select("th:containsOwn(Height:)+td");
+                stats.add(height.text());
+                Elements weight = infoTable.select("th:containsOwn(Weight:)+td");
+                stats.add(weight.text());
+                Elements outOf = infoTable.select("th:containsOwn(Out of:)+td");
+                stats.add(outOf.text());
+            }
+            catch (Exception e){
+                stats.add("--");
+                stats.add("--");
+                stats.add("--");
+                stats.add("--");
+            }
+            return stats;
+        }
+
+
+        public ArrayList<String> getFightMatrixData(Document document) throws IOException {
+            ArrayList<String> stats=new ArrayList<>();
+            String fighterUrl;
+
+            Elements table=document.select("table.tblRank");
+            Elements links=table.select("a[href]");
+            fighterUrl=links.get(0).attr("abs:href");
+
+            Document fighterPage=Jsoup.connect(fighterUrl).get();
+            try {
+                Elements rankHeadRow = fighterPage.select("td.tdRankHead");
+                Element proDebutROw = rankHeadRow.get(3);
+                Elements proDebutCell = proDebutROw.select("td");
+                Element proDebut = proDebutCell.get(5);
+                stats.add(proDebut.text());
+
+                Elements rankRow = fighterPage.select("td.tdRank");
+                Elements rankLinks = rankRow.select("a");
+                Element link = rankLinks.get(0);
+                stats.add(link.text());
+
+                Elements team=fighterPage.select("td:containsOwn(Association)+td");
+                stats.add(team.text());
+            }
+            catch (Exception e){
+                stats.add("--");
+                stats.add("--");
+                stats.add("--");
+            }
+            return stats;
         }
 
         @Override
-        protected void onPostExecute(Document document) {
-            FighterStats stats=new FighterStats();
-
-            Elements values=document.select("td");
-            Element from=values.get(1);
-            stats.setmFrom(from.text());
-            Element fightsOut=values.get(3);
-            stats.setmFightsOutOf(fightsOut.text());
-            Element age=values.get(5);
-            stats.setmAge(age.text());
-            Element height=values.get(7);
-            stats.setmHeight(height.text());
-            Element weight=values.get(9);
-            stats.setmWeight(weight.text());
-            Element weightclass=values.get(11);
-            stats.setmWeightClass(weightclass.text());
-
-
+        protected void onPostExecute(ArrayList<String> stats) {
+            FighterStats fighterStats=new FighterStats();
+            fighterStats.setmFirst(stats.get(0));
+            fighterStats.setmLast(stats.get(1));
+            fighterStats.setmAge(stats.get(2));
+            fighterStats.setmHeight(stats.get(3));
+            fighterStats.setmWeight(stats.get(4));
+            fighterStats.setmFightsOutOf(stats.get(5));
+            fighterStats.setmProfDebut(stats.get(6));
+            fighterStats.setmRank(stats.get(7));
+            fighterStats.setmTeam(stats.get(8));
+            notifyListeners(fighterStats);
         }
+    }
+
+    public void notifyListeners(FighterStats fighterStats){
+        for(StaticDataListener listener:mStatsListener){
+            listener.OnDataReceived(fighterStats);
+        }
+    }
+
+    public interface StaticDataListener{
+        public void OnDataReceived(FighterStats fighterStats);
     }
 
     //Interface used to read JSon files from data each class that implements it , is used to extract different data from the item
@@ -172,85 +228,12 @@ public  class Database  {
                     }
                     mFighters.add(fighter);
                 }
-                    getData(FighterStats.mBaseFighterStatsUrl+FighterStats.WEIGHT_KEY_ALL,new GetCountryCode(mFighters));
+                NotifyListeners(true);
             } catch (JSONException e) {
                 Log.v("EXCEPTION",e.getMessage());
             }
         }
     }
-
-    private class GetCountryCode implements readJson{
-        private ArrayList<Fighter> mFighters;
-        public GetCountryCode(ArrayList<Fighter> fighters){
-            mFighters=fighters;
-        }
-
-        @Override
-        public void execute(String json) {
-            try {
-                JSONArray array= new JSONArray(json);
-                for (int x=0;x<mFighters.size();x++) {
-                    for (int i = 0; i < array.length(); i++) {
-                        JSONObject stat = array.getJSONObject(i);
-                        if (stat.getInt("statid") == (mFighters.get(x).getmStatId())) {
-                            mFighters.get(x).setCountryCode(stat.getString("Born"));
-                            break;
-                        }
-                    }
-                }
-                    NotifyListeners(true);
-            } catch (JSONException e) {
-                Log.v("EXCEPTION",e.getMessage());
-            }
-
-        }
-    }
-
-
-    private class FindSpecificCountryCode implements readJson{ //is used if the country code couldn't be found using GetCountryCode
-        private Fighter mFighter;
-        private ArrayList<String> mCountries;
-        private ArrayList<String> mWeightClasses;
-        public FindSpecificCountryCode(Fighter fighter,ArrayList<String> countries,ArrayList<String> weightclasses)
-        {
-            mFighter=fighter;
-            mCountries=countries;
-            mWeightClasses=weightclasses;
-        }
-
-        @Override
-        public void execute(String json) {
-            try {
-                JSONArray array=new JSONArray(json);
-                for (int i=0;i<array.length();i++){
-                    JSONObject object=array.getJSONObject(i);
-                    if(object.getString("statid").equals(mFighter.getmStatId()+"")){
-                        mFighter.setCountryCode(object.getString("Born"));
-                        notifyListeners(object.getString("Born"),true);
-                        return;
-                    }
-                }
-                if(mCountries.size()>0)
-                getData(FighterStats.mCountriesUrl+mCountries.remove(0),new FindSpecificCountryCode(mFighter,mCountries,mWeightClasses));
-                else if(mWeightClasses.size()>0)
-                    getData(FighterStats.mBaseFighterStatsUrl+mWeightClasses.remove(0),new FindSpecificCountryCode(mFighter,mCountries,mWeightClasses));
-                else
-                    notifyListeners(null,false);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-
-        public void notifyListeners(String code,boolean found){
-            for (OnCountryCodeFoundListener listener:mCountryCodeListeners)
-                listener.OnCountryCodeFound(code,found);
-        }
-    }
-
-    public interface  OnCountryCodeFoundListener{
-        public void OnCountryCodeFound(String code, boolean found);
-    }
-
 
     private void  NotifyListeners(boolean sucess){
         if(sucess)
