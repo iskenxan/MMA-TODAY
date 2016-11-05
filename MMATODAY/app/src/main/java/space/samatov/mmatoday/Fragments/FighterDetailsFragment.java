@@ -58,12 +58,10 @@ public class FighterDetailsFragment extends Fragment implements Database.StaticD
         mFighterStats=new FighterStats();
         mFighter=args.getParcelable("fighter");
 
-        mFighterStats.setmFirst(mFighter.getFirstName());
-        mFighterStats.setmLast(mFighter.getLastName());
 
         Database database=new Database();
         database.addStatsListener(this);
-        database.readFighterStatsHtml(mFighterStats);
+        database.readFighterStatsHtml(mFighter);
         return mView;
     }
 

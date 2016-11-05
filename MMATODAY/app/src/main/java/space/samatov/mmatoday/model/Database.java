@@ -30,11 +30,11 @@ import okhttp3.Response;
 public  class Database  {
     private static String mFightersUrl="http://ufc-data-api.ufc.com/api/v3/iphone/fighters";
     public static final String mFightMatrixSearchUrl="http://www.fightmatrix.com/fighter-search/?fName=";
-    public static final String mMixedMartialArtsSearchUrl="http://www.mixedmartialarts.com/fighter/search?search=";
-
+    public static final String mMartialArtsSearchUrl="http://www.mixedmartialarts.com/fighter/search?search=";
     private int mCounter=0;
     public ArrayList<Fighter> mFighters;
 
+    public Fighter mCurrentDetailsFighter=new Fighter();
 
     private ArrayList<DataListener> mListeners=new ArrayList<DataListener>();
     private ArrayList<StaticDataListener> mStatsListener=new ArrayList<>();
@@ -71,25 +71,31 @@ public  class Database  {
         });
     }
 
-    public  void readFighterStatsHtml(FighterStats stats){
+    public  void readFighterStatsHtml(Fighter fighter){
         JsoupReader reader=new JsoupReader();
-        reader.execute(stats);
+        reader.execute(fighter);
     }
 
-    private  class JsoupReader extends AsyncTask<FighterStats,Void,ArrayList<String>>{
+    private  class JsoupReader extends AsyncTask<Fighter,Void,ArrayList<String>>{
 
 
         @Override
-        protected ArrayList<String> doInBackground(FighterStats... fighterStatses) {
-            FighterStats stats=fighterStatses[0];
-            String mixedMarialArtsUrl=mMixedMartialArtsSearchUrl+stats.getmFirst()+"+"+stats.getmLast();
-            String fightMatrixUrl=mFightMatrixSearchUrl+stats.getmFirst()+"+"+stats.getmLast();
+        protected ArrayList<String> doInBackground(Fighter... fighters) {
+            Fighter fighter=fighters[0];
+            mCurrentDetailsFighter=fighter;
+            String fightMatrixUrl;
+            String martialArtsUrl=mMartialArtsSearchUrl+fighter.getmUrlSearchName();
+            if(fighter.ismIsUFC())
+                fightMatrixUrl=mFightMatrixSearchUrl+fighter.getmUrlSearchName();
+
+            else
+                 fightMatrixUrl=mFightMatrixSearchUrl+fighter.getFirstName()+"+"+fighter.getLastName();
             ArrayList<String > results=new ArrayList<>();
-            results.add(stats.getmFirst());
-            results.add(stats.getmLast());
+            results.add(fighter.getFirstName());
+            results.add(fighter.getLastName());
             try {
-                results.addAll(getMarialArtsData(Jsoup.connect(mixedMarialArtsUrl).get()));
-                results.addAll(getFightMatrixData(Jsoup.connect(fightMatrixUrl).get()));
+                results.addAll(getUFCAboutDetailsData(fighter.getmFighterDetailsPageUrl(),martialArtsUrl));
+                results.addAll(getFightMatrixData(fightMatrixUrl));
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -97,18 +103,35 @@ public  class Database  {
             return results;
         }
 
-        public ArrayList<String> getMarialArtsData(Document document) throws IOException{
+        public ArrayList<String> getMartialArtsData(String fightMatrixUrl,ArrayList<String> failedToGet) throws IOException{
+            Document  document =Jsoup.connect(fightMatrixUrl).get();
             ArrayList<String> stats=new ArrayList<>();
             Elements infoTable=document.select("table.fighter-info");
             try {
-                Elements age = infoTable.select("th:containsOwn(Age:)+td");
-                stats.add(age.text());
-                Elements height = infoTable.select("th:containsOwn(Height:)+td");
-                stats.add(height.text());
-                Elements weight = infoTable.select("th:containsOwn(Weight:)+td");
-                stats.add(weight.text());
-                Elements outOf = infoTable.select("th:containsOwn(Out of:)+td");
-                stats.add(outOf.text());
+                if(failedToGet.contains("Age")) {
+                    Elements age = infoTable.select("th:containsOwn(Age:)+td");
+                    stats.add(age.text());
+                }
+                else
+                stats.add("--");
+                if(failedToGet.contains("Height")) {
+                    Elements height = infoTable.select("th:containsOwn(Height:)+td");
+                    stats.add(height.text());
+                }
+                else
+                    stats.add("--");
+                if(failedToGet.contains("Weight")) {
+                    Elements weight = infoTable.select("th:containsOwn(Weight:)+td");
+                    stats.add(weight.text());
+                }
+                else
+                    stats.add("--");
+                if(failedToGet.contains("Out")) {
+                    Elements outOf = infoTable.select("th:containsOwn(Out of:)+td");
+                    stats.add(outOf.text());
+                }
+                else
+                    stats.add("--");
             }
             catch (Exception e){
                 stats.add("--");
@@ -119,17 +142,63 @@ public  class Database  {
             return stats;
         }
 
+        public ArrayList<String> getUFCAboutDetailsData(String ufcUrl,String martialArtsUrl) throws IOException{
+            Document document=Jsoup.connect(ufcUrl).get();
+            ArrayList<String> stats=new ArrayList<>();
+            ArrayList<String> failedToGet=new ArrayList<>();
+            Elements outOf=document.select("li:contains(From:)");
+            Elements  age= document.select("li:contains(Age:)");
+            Elements height=document.select("li:contains(Height:)");
+            Elements weight=document.select("li:contains(Weight:)");
+            String ageStr=age.text().replaceAll("Age:","");
+            if(ageStr.equals(""))
+                failedToGet.add("Age");
+            String outStr=outOf.text().replaceAll("From:","");
+            if(outStr.equals(""))
+                failedToGet.add("Out");
+            String heightStr=height.text().replaceAll("Height:","");
+            if(heightStr.equals(""))
+                failedToGet.add("Height");
+            String weightStr=weight.text().replaceAll("Weight:","");
+            if(weightStr.equals(""))
+                failedToGet.add("Weight");
+            ArrayList<String> result=new ArrayList<>();
+            if(failedToGet.size()>0){
 
-        public ArrayList<String> getFightMatrixData(Document document) throws IOException {
+              result=  getMartialArtsData(martialArtsUrl,failedToGet);
+            }
+            if(result.size()>0&&!result.get(0).equals("--"))
+                stats.add(result.get(0));
+                else
+            stats.add(ageStr);
+            if(result.size()>0&&!result.get(1).equals("--"))
+                stats.add(result.get(1));
+                else
+            stats.add(heightStr);
+            if(result.size()>0&&!result.get(2).equals("--"))
+                stats.add(result.get(2));
+                else
+            stats.add(weightStr);
+            if(result.size()>0&&!result.get(3).equals("--"))
+                stats.add(result.get(3));
+                else
+            stats.add(outStr);
+
+            return stats;
+        }
+
+
+        public ArrayList<String> getFightMatrixData(String url) throws IOException {
+            Document document=Jsoup.connect(url).get();
             ArrayList<String> stats=new ArrayList<>();
             String fighterUrl;
 
             Elements table=document.select("table.tblRank");
             Elements links=table.select("a[href]");
-            fighterUrl=links.get(0).attr("abs:href");
-
-            Document fighterPage=Jsoup.connect(fighterUrl).get();
             try {
+            fighterUrl=links.get(0).attr("abs:href");
+            Document fighterPage=Jsoup.connect(fighterUrl).get();
+
                 Elements rankHeadRow = fighterPage.select("td.tdRankHead");
                 Element proDebutROw = rankHeadRow.get(3);
                 Elements proDebutCell = proDebutROw.select("td");
@@ -145,6 +214,11 @@ public  class Database  {
                 stats.add(team.text());
             }
             catch (Exception e){
+                try {
+                    stats = getFightMatrixData(mFightMatrixSearchUrl + mCurrentDetailsFighter.getFirstName() + "+" + mCurrentDetailsFighter.getLastName());
+                }
+                catch (Exception e2)
+                {}
                 stats.add("--");
                 stats.add("--");
                 stats.add("--");
@@ -194,9 +268,12 @@ public  class Database  {
                     JSONObject jsonObject=jsonArray.getJSONObject(i);
                     Fighter fighter=new Fighter();
                     fighter.setFirstName(jsonObject.getString("first_name"));
+                    fighter.setmIsUFC(true);
                     fighter.setLastName(jsonObject.getString("last_name"));
                     fighter.setNickName(jsonObject.getString("nickname"));
                     fighter.setmWeightClass(jsonObject.getString("weight_class"));
+                    fighter.setmFighterDetailsPageUrl(jsonObject.getString("link"));
+                    fighter.setmUrlSearchName(null);
                     if(jsonObject.has("belt_thumbnail"))
                         fighter.setmBeltProfileUrl(jsonObject.getString("belt_thumbnail"));
                     int wins,losses,draws;
@@ -205,6 +282,7 @@ public  class Database  {
                          losses = jsonObject.getInt("losses");
                          draws = jsonObject.getInt("draws");
                         fighter.setFightsRecord(wins,losses,draws);
+
                     }
                     catch (JSONException e) {
                         continue;
@@ -215,17 +293,18 @@ public  class Database  {
                     else
                     fighter.setFullBodyUrl("default");
 
-                    fighter.setId(jsonObject.getInt("id"));
+
                     fighter.setPFP(jsonObject.getString("pound_for_pound_rank"));
                     if(fighter.getPFP()==null)
                         fighter.setPFP("none");
                     fighter.setTitleHolder(jsonObject.getBoolean("title_holder"));
                     try{
-                        fighter.setmStatId(jsonObject.getInt("statid"));
+                        fighter.setId(jsonObject.getInt("id"));
                     }
                     catch (Exception e){
-                        fighter.setmStatId(-1);
+                        fighter.setId(-1);
                     }
+
                     mFighters.add(fighter);
                 }
                 NotifyListeners(true);

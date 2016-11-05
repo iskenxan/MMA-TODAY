@@ -8,21 +8,20 @@ public class Fighter implements Parcelable,ListItem {
     private String mLastName;
     private String mNickName;
     private String mWeightClass;
-    private String mCountryCode;
     private String mProfileUrl;
     private String mBeltProfileUrl="";
     private String mFullBodyUrl="";
+    private String mUrlSearchName="";
     private String mPFP;
+    private String mFighterDetailsPageUrl;
     private boolean mTitleHolder;
     private int mWins;
     private int mLosses;
     private int mDraws;
     private int mId;
-    private int mStatId;
-    public Fighter(){
+    private boolean mIsUFC;
 
-    }
-
+    public Fighter(){}
 
     public void setFightsRecord(int wins,int losses,int draws){
         setWins(wins);
@@ -133,20 +132,34 @@ public class Fighter implements Parcelable,ListItem {
         this.mFullBodyUrl = mFullBodyUrl;
     }
 
-    public String getCountryCode() {
-        return mCountryCode;
+
+    public String getmFighterDetailsPageUrl() {
+        return mFighterDetailsPageUrl;
     }
 
-    public int getmStatId() {
-        return mStatId;
+    public void setmFighterDetailsPageUrl(String mFighterDetailsPageUrl) {
+        this.mFighterDetailsPageUrl = mFighterDetailsPageUrl;
     }
 
-    public void setmStatId(int mStatId) {
-        this.mStatId = mStatId;
+    public boolean ismIsUFC() {
+        return mIsUFC;
     }
 
-    public void setCountryCode(String mCountryCode) {
-        this.mCountryCode = mCountryCode;
+    public void setmIsUFC(boolean mIsUFC) {
+        this.mIsUFC = mIsUFC;
+    }
+
+    public String getmUrlSearchName() {
+        return mUrlSearchName;
+    }
+
+    public void setmUrlSearchName(String mUrlSearchName) {
+        if(ismIsUFC()) {
+            String url=mFighterDetailsPageUrl;
+            url=url.replaceAll("http://www.ufc.com/fighter/","");
+            url=url.replaceAll("-","+");
+            this.mUrlSearchName=url;
+        }
     }
 
     //**********Parcelable*************
