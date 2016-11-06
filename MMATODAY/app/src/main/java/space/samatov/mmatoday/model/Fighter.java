@@ -3,6 +3,8 @@ package space.samatov.mmatoday.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.regex.Matcher;
+
 public class Fighter implements Parcelable,ListItem {
     private String mFirstName;
     private String mLastName;
@@ -58,14 +60,25 @@ public class Fighter implements Parcelable,ListItem {
     }
 
     public void setNickName(String nickName) {
+        if(nickName.equals("null"))
+            mNickName="";
+        else
         mNickName = nickName;
     }
 
     public String getmWeightClass() {
         return mWeightClass;
     }
+
+
     public void setmWeightClass(String mWeightClass) {
         this.mWeightClass = mWeightClass;
+
+      //  if(this.mWeightClass.contains("_")) {
+        //    String[] strs = this.mWeightClass.split("_");
+        //    this.mWeightClass=strs[0]+" "+strs[1];
+      //  }
+
     }
 
     public String getPFP() {

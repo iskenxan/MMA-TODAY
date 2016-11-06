@@ -69,6 +69,10 @@ public class MainActivity extends AppCompatActivity implements Database.DataList
 
     @Override
     public void onDataReceived() {
+       // for (int i=0;i<mDatabase.mFighters.size();i++){
+          // Fighter fighter=mDatabase.mFighters.get(i);
+            //fighter.setmWeightClass(fighter.getmWeightClass().replaceAll("_"," "));
+       // }
         startViewPagerFragment();
     }
 

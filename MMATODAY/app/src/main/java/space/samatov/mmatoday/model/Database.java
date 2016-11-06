@@ -95,7 +95,7 @@ public  class Database  {
             results.add(fighter.getLastName());
             try {
                 results.addAll(getUFCAboutDetailsData(fighter.getmFighterDetailsPageUrl(),martialArtsUrl));
-                results.addAll(getFightMatrixData(fightMatrixUrl));
+                results.addAll(getFightMatrixData(fightMatrixUrl,true));
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -188,7 +188,7 @@ public  class Database  {
         }
 
 
-        public ArrayList<String> getFightMatrixData(String url) throws IOException {
+        public ArrayList<String> getFightMatrixData(String url,boolean isFirstTime) throws IOException {
             Document document=Jsoup.connect(url).get();
             ArrayList<String> stats=new ArrayList<>();
             String fighterUrl;
@@ -199,29 +199,34 @@ public  class Database  {
             fighterUrl=links.get(0).attr("abs:href");
             Document fighterPage=Jsoup.connect(fighterUrl).get();
 
-                Elements rankHeadRow = fighterPage.select("td.tdRankHead");
-                Element proDebutROw = rankHeadRow.get(3);
-                Elements proDebutCell = proDebutROw.select("td");
-                Element proDebut = proDebutCell.get(5);
+                Elements proDebut=fighterPage.select("td:containsOwn(Pro Debut Date:)+td");
                 stats.add(proDebut.text());
 
-                Elements rankRow = fighterPage.select("td.tdRank");
-                Elements rankLinks = rankRow.select("a");
-                Element link = rankLinks.get(0);
-                stats.add(link.text());
-
+                Elements currentrank=fighterPage.select("td:contains(Current Rank:) a");
+                if(currentrank.size()==0){
+                    Elements lastRank=fighterPage.select("td:contains(Last Ranked:) a");
+                    stats.add(lastRank.get(0).text());
+                }
+                else {
+                    stats.add(currentrank.get(0).text());
+                }
                 Elements team=fighterPage.select("td:containsOwn(Association)+td");
                 stats.add(team.text());
             }
             catch (Exception e){
-                try {
-                    stats = getFightMatrixData(mFightMatrixSearchUrl + mCurrentDetailsFighter.getFirstName() + "+" + mCurrentDetailsFighter.getLastName());
+                if(isFirstTime) {
+                    try {
+                        stats = getFightMatrixData(mFightMatrixSearchUrl + mCurrentDetailsFighter.getFirstName() + "+" + mCurrentDetailsFighter.getLastName(), false);
+                    } catch (Exception e2) {
+
+                    }
+                    if(stats.size()==0){
+                        stats.add("n/a");
+                        stats.add("n/a");
+                        stats.add("n/a");
+                    }
                 }
-                catch (Exception e2)
-                {}
-                stats.add("--");
-                stats.add("--");
-                stats.add("--");
+
             }
             return stats;
         }
@@ -271,8 +276,8 @@ public  class Database  {
                     fighter.setmIsUFC(true);
                     fighter.setLastName(jsonObject.getString("last_name"));
                     fighter.setNickName(jsonObject.getString("nickname"));
-                    fighter.setmWeightClass(jsonObject.getString("weight_class"));
-                    fighter.setmFighterDetailsPageUrl(jsonObject.getString("link"));
+                        fighter.setmWeightClass(jsonObject.getString("weight_class"));
+                        fighter.setmFighterDetailsPageUrl(jsonObject.getString("link"));
                     fighter.setmUrlSearchName(null);
                     if(jsonObject.has("belt_thumbnail"))
                         fighter.setmBeltProfileUrl(jsonObject.getString("belt_thumbnail"));
