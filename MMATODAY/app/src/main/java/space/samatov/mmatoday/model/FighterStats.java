@@ -18,7 +18,7 @@ public class FighterStats {
     private String mSubmissionAttempts;
     private String mSigStrikesLanded;
     private String mSigStrikesAccuracy;
-    private String mStikesLandedPerMinute;
+    private String mStrikesAbsorbed;
     private String mSigStrikesDef;
     private String mProfDebut;
     private String mRank;
@@ -116,9 +116,7 @@ public class FighterStats {
     }
 
     public void setmTakeDownAccuracy(String mTakeDownAccuracy) {
-        float value=Float.valueOf(mTakeDownAccuracy);
-        int rounded=Math.round(value);
-        this.mTakeDownAccuracy = rounded+"%";
+        this.mTakeDownAccuracy = mTakeDownAccuracy;
     }
 
     public String getmTakeDownDefence() {
@@ -126,9 +124,7 @@ public class FighterStats {
     }
 
     public void setmTakeDownDefence(String mTakeDownDefence) {
-        float value=Float.valueOf(mTakeDownDefence);
-        int rounded=Math.round(value);
-        this.mTakeDownDefence = rounded+"%";
+        this.mTakeDownDefence = mTakeDownDefence;
     }
 
     public String getmSubmissionAttempts() {
@@ -152,17 +148,15 @@ public class FighterStats {
     }
 
     public void setmSigStrikesAccuracy(String mSigStrikesAccuracy) {
-        float value=Float.valueOf(mSigStrikesAccuracy);
-        int rounded=Math.round(value);
-        this.mSigStrikesAccuracy = rounded+"%";
+        this.mSigStrikesAccuracy = mSigStrikesAccuracy;
     }
 
-    public String getmStikesLandedPerMinute() {
-        return mStikesLandedPerMinute;
+    public String getmStrikesAbsorbed() {
+        return mStrikesAbsorbed;
     }
 
-    public void setmStikesLandedPerMinute(String mStikesLandedPerMinute) {
-        this.mStikesLandedPerMinute = mStikesLandedPerMinute;
+    public void setmStrikesAbsorbed(String mStrikesAbsorbed) {
+        this.mStrikesAbsorbed = mStrikesAbsorbed;
     }
 
     public String getmSigStrikesDef() {
@@ -170,9 +164,7 @@ public class FighterStats {
     }
 
     public void setmSigStrikesDef(String mSigStrikesDef) {
-        float value=Float.valueOf(mSigStrikesDef);
-        int rounded=Math.round(value);
-        this.mSigStrikesDef = rounded+"%";
+        this.mSigStrikesDef = mSigStrikesDef;
     }
 
     public String getmProfDebut() {

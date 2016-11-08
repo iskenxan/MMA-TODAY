@@ -72,12 +72,8 @@ public class Fighter implements Parcelable,ListItem {
 
 
     public void setmWeightClass(String mWeightClass) {
+        mWeightClass=mWeightClass.replaceAll("_"," ");
         this.mWeightClass = mWeightClass;
-
-      //  if(this.mWeightClass.contains("_")) {
-        //    String[] strs = this.mWeightClass.split("_");
-        //    this.mWeightClass=strs[0]+" "+strs[1];
-      //  }
 
     }
 

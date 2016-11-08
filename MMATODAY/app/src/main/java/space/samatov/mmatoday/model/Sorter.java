@@ -13,10 +13,10 @@ public class Sorter {
     public static final String LIGHTWEIGHT = "Lightweight";
     public static final String WELTERWEIGHT = "Welterweight";
     public static final String MIDDLEWEIGHT = "Middleweight";
-    public static final String LIGHT_HEAVYWEIGHT = "Light_Heavyweight";
+    public static final String LIGHT_HEAVYWEIGHT = "Light Heavyweight";
     public static final String HEAVYWEIGHT = "Heavyweight";
-    public static final String W_STRAWWEIGHT = "Women_Strawweight";
-    public static final String W_BANTAMWEIGHT = "Women_Bantamweight";
+    public static final String W_STRAWWEIGHT = "Women Strawweight";
+    public static final String W_BANTAMWEIGHT = "Women Bantamweight";
     public static final String GENDER_MEN = "Male";
     public static final String GENDER_WOMEN = "Female";
 

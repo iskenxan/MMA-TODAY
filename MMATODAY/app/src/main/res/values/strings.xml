@@ -1,6 +1,15 @@
 <resources>
     <string name="app_name">MMA TODAY</string>
+
+
     <string name="action_settings">Settings</string>
+    <string name="action_ufc_fighters">UFC Fighters</string>
+    <string name="news">News</string>
+    <string name="all_time_ranks">All time ranks</string>
+    <string name="octagon_girls">Octagon girls</string>
+    <string name="quiz">Quizzes</string>
+
+
     <string-array name="men_weightclass_array">
         <item>Flyweight</item>
         <item>Bantamweight</item>

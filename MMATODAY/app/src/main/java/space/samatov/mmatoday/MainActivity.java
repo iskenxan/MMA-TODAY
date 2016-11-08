@@ -7,6 +7,9 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import samatov.space.mmatoday.R;
@@ -29,10 +32,31 @@ public class MainActivity extends AppCompatActivity implements Database.DataList
 
         mDatabase=new Database();
         mDatabase.addListener(this);
-        if(isConnected())
-        mDatabase.getFightersData();
-        else
-            DisplayErrorMessage();
+        mDatabase.readAllTimeRanks();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater=getMenuInflater();
+        inflater.inflate(R.menu.menu_main,menu);
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int itemId=item.getItemId();
+        switch (itemId){
+            case R.id.ufcFightersListItem:{
+                if(isConnected())
+                    mDatabase.getFightersData();
+                else
+                    DisplayErrorMessage();
+                return true;
+            }
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     public void startViewPagerFragment(){
@@ -69,10 +93,6 @@ public class MainActivity extends AppCompatActivity implements Database.DataList
 
     @Override
     public void onDataReceived() {
-       // for (int i=0;i<mDatabase.mFighters.size();i++){
-          // Fighter fighter=mDatabase.mFighters.get(i);
-            //fighter.setmWeightClass(fighter.getmWeightClass().replaceAll("_"," "));
-       // }
         startViewPagerFragment();
     }
 
@@ -91,6 +111,5 @@ public class MainActivity extends AppCompatActivity implements Database.DataList
         fragment.setArguments(args);
         fragmentManager.beginTransaction().replace(R.id.mainPlaceholder,fragment,FighterDetailsFragment.FRAGMENT_KEY)
                 .addToBackStack(null).commit();
-
     }
 }

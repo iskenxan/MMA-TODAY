@@ -22,9 +22,14 @@ public class WomenListFragment extends List_Fragment {
 
     @Override
     public void spinnerCallback(int i) {
-        mRecyclerView.getLayoutManager().scrollToPosition(0);
-        mCurrentFighters=Sorter.getSpinnerSelectedDivionWomen(i,mFighters);
-        mCurrentFighters=Sorter.sortAlphabetically(mCurrentFighters);
-        notifyListeners(mCurrentFighters);
+        try {
+            mRecyclerView.getLayoutManager().scrollToPosition(0);
+            mCurrentFighters = Sorter.getSpinnerSelectedDivionWomen(i, mFighters);
+            mCurrentFighters = Sorter.sortAlphabetically(mCurrentFighters);
+            notifyListeners(mCurrentFighters);
+        }
+        catch (Exception e){
+            e.getMessage();
+        }
     }
 }
