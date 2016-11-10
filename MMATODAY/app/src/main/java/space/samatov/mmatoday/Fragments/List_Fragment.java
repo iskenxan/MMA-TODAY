@@ -23,7 +23,7 @@ import space.samatov.mmatoday.model.OnListItemClicked;
 public abstract class List_Fragment extends android.support.v4.app.Fragment implements AdapterView.OnItemSelectedListener {
     protected ArrayList<Fighter> mFighters;
     protected ArrayList<ListItem> mCurrentFighters;
-    private ArrayList<RecyclerViewDataChangedListener> mListeners;
+    protected ArrayList<RecyclerViewDataChangedListener> mListeners;
     protected RecyclerView mRecyclerView;
     protected Spinner mSpinner;
 
@@ -70,14 +70,7 @@ public abstract class List_Fragment extends android.support.v4.app.Fragment impl
             listener.onDataChanged(data);
     }
 
-    public void setupRecyclerView(){
-        RecyclerView.LayoutManager layoutManager=new LinearLayoutManager(getActivity());
-        mRecyclerView.setLayoutManager(layoutManager);
-
-        RecyclerViewAdapter adapter=new RecyclerViewAdapter(mCurrentFighters,(OnListItemClicked)getActivity());
-        mListeners.add(adapter);
-        mRecyclerView.setAdapter(adapter);
-    }
+    public abstract void setupRecyclerView();
 
 }
 

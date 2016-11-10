@@ -2,8 +2,7 @@ package space.samatov.mmatoday.model;
 
 
 import android.os.AsyncTask;
-import android.os.Parcel;
-import android.os.Parcelable;
+import android.os.Bundle;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -11,15 +10,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.ListIterator;
-import java.util.StringTokenizer;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -36,19 +30,22 @@ public  class Database  {
 
 
 
-
     private int mCounter=0;
-    public ArrayList<Fighter> mFighters;
+    public ArrayList<Fighter> mUFCfighters;
+    public ArrayList<Fighter> mAllTimeFighters;
 
     public Fighter mCurrentDetailsFighter=new Fighter();
 
     private ArrayList<DataListener> mListeners=new ArrayList<DataListener>();
     private ArrayList<StatsDataListener> mStatsListener=new ArrayList<>();
+    private ArrayList<AllTimeDataListener> mAllTimeDataListeners=new ArrayList<>();
+
 
     public void addListener(DataListener listener){
         mListeners.add(listener);
     }
     public void addStatsListener(StatsDataListener listener){mStatsListener.add(listener);}
+    public void addAllTimeRankListener(AllTimeDataListener listener){mAllTimeDataListeners.add(listener);}
 
     public void getFightersData(){
         getData(mFightersUrl,new GetFigthersData());
@@ -82,123 +79,171 @@ public  class Database  {
         reader.execute(fighter);
     }
 
-    private  class StatsJsoupReader extends AsyncTask<Fighter,Void,ArrayList<String>>{
+    private  class StatsJsoupReader extends AsyncTask<Fighter,Void,Bundle>{
 
 
         @Override
-        protected ArrayList<String> doInBackground(Fighter... fighters) {
+        protected Bundle doInBackground(Fighter... fighters) {
             Fighter fighter=fighters[0];
             mCurrentDetailsFighter=fighter;
             String fightMatrixUrl;
-            String martialArtsUrl=mMartialArtsSearchUrl+fighter.getmUrlSearchName();
+            String martialArtsUrl="";
             String fightmeetricsUrl=mFightMetricsSearchUrl+fighter.getLastName();
-            if(fighter.ismIsUFC())
-                fightMatrixUrl=mFightMatrixSearchUrl+fighter.getmUrlSearchName();
-
-            else
-                 fightMatrixUrl=mFightMatrixSearchUrl+fighter.getFirstName()+"+"+fighter.getLastName();
-            ArrayList<String > results=new ArrayList<>();
-            results.add(fighter.getFirstName());
-            results.add(fighter.getLastName());
+            if(fighter.ismIsUFC()) {
+                fightMatrixUrl = mFightMatrixSearchUrl + fighter.getmUrlSearchName();
+                martialArtsUrl=mMartialArtsSearchUrl+fighter.getmUrlSearchName();
+            }
+            else {
+                fightMatrixUrl = mFightMatrixSearchUrl + fighter.getFirstName() + "+" + fighter.getLastName();
+                martialArtsUrl = mMartialArtsSearchUrl + fighter.getFirstName() + "+" + fighter.getLastName();
+            }
+            Bundle results=new Bundle();
+            Bundle basicInfo=new Bundle();
+            Bundle ranks=new Bundle();
+            Bundle stats=new Bundle();
             try {
-                results.addAll(getUFCAboutDetailsData(fighter.getmFighterDetailsPageUrl(),martialArtsUrl));
-                results.addAll(getFightMatrixData(fightMatrixUrl,true));
-                results.addAll(getFightMetricsData(fightmeetricsUrl));
+                 basicInfo= getUFCAboutDetailsData(fighter.getmFighterDetailsPageUrl(),martialArtsUrl);
+                basicInfo.putString("first",fighter.getFirstName());
+                basicInfo.putString("last",fighter.getLastName());
+
+                if(basicInfo.getString("record").equals("--"))
+                    ranks= getFightMatrixData(fightMatrixUrl,true,true);
+                else
+                    ranks= getFightMatrixData(fightMatrixUrl,true,false);
+
+                stats= getFightMetricsData(fightmeetricsUrl,true);
 
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            results.putBundle("basic_info",basicInfo);
+            results.putBundle("ranks",ranks);
+            results.putBundle("stats",stats);
             return results;
         }
 
-        public ArrayList<String> getMartialArtsData(String fightMatrixUrl,ArrayList<String> failedToGet) throws IOException{
-            Document  document =Jsoup.connect(fightMatrixUrl).get();
-            ArrayList<String> stats=new ArrayList<>();
+        public Bundle getMartialArtsData(String fightMatrixUrl,ArrayList<String> failedToGet) throws IOException{
+            Document  document;
+            if(mCurrentDetailsFighter.getFirstName().equals("Don")&&mCurrentDetailsFighter.getLastName().equals("Frye"))
+                document =Jsoup.connect("http://www.mixedmartialarts.com/fighter/Don-Frye:1BA546076E84FC66").get();
+            else
+            document =Jsoup.connect(fightMatrixUrl).get();
+            Bundle stats=new Bundle();
             Elements infoTable=document.select("table.fighter-info");
             try {
                 if(failedToGet.contains("Age")) {
                     Elements age = infoTable.select("th:containsOwn(Age:)+td");
-                    stats.add(age.text());
+                    stats.putString("age",age.text());
                 }
                 else
-                stats.add("--");
+                    stats.putString("age","--");
                 if(failedToGet.contains("Height")) {
                     Elements height = infoTable.select("th:containsOwn(Height:)+td");
-                    stats.add(height.text());
+                    stats.putString("height",height.text());
                 }
                 else
-                    stats.add("--");
+                    stats.putString("height","--");
                 if(failedToGet.contains("Weight")) {
                     Elements weight = infoTable.select("th:containsOwn(Weight:)+td");
-                    stats.add(weight.text());
+                    stats.putString("height",weight.text());
                 }
                 else
-                    stats.add("--");
+                    stats.putString("weight","--");
                 if(failedToGet.contains("Out")) {
                     Elements outOf = infoTable.select("th:containsOwn(Out of:)+td");
-                    stats.add(outOf.text());
+                    stats.putString("out",outOf.text());
                 }
                 else
-                    stats.add("--");
+                    stats.putString("out","--");
+                if(failedToGet.contains("Record")){
+                    Elements record= infoTable.select("th:containsOwn(Pro Record:)+td");
+                    stats.putString("record",record.text());
+                }
+                else
+                    stats.putString("record","--");
             }
             catch (Exception e){
-                stats.add("--");
-                stats.add("--");
-                stats.add("--");
-                stats.add("--");
+                stats.putString("age","--");
+                stats.putString("height","--");
+                stats.putString("weight","--");
+                stats.putString("out","--");
+                stats.putString("record","--");
             }
             return stats;
         }
 
-        public ArrayList<String> getUFCAboutDetailsData(String ufcUrl,String martialArtsUrl) throws IOException{
-            Document document=Jsoup.connect(ufcUrl).get();
-            ArrayList<String> stats=new ArrayList<>();
-            ArrayList<String> failedToGet=new ArrayList<>();
-            Elements outOf=document.select("li:contains(From:)");
-            Elements  age= document.select("li:contains(Age:)");
-            Elements height=document.select("li:contains(Height:)");
-            Elements weight=document.select("li:contains(Weight:)");
-            String ageStr=age.text().replaceAll("Age:","");
-            if(ageStr.equals(""))
+        public Bundle getUFCAboutDetailsData(String ufcUrl,String martialArtsUrl) throws IOException{
+            Bundle stats=new Bundle();
+            ArrayList<String> failedToGet = new ArrayList<>();
+            if(mCurrentDetailsFighter.ismIsUFC()) {
+                Document document = Jsoup.connect(ufcUrl).get();
+
+
+                Elements outOf = document.select("li:contains(From:)");
+                Elements age = document.select("li:contains(Age:)");
+                Elements height = document.select("li:contains(Height:)");
+                Elements weight = document.select("li:contains(Weight:)");
+                Elements record=document.select("li:contains(Record:)");
+                String ageStr = age.text().replaceAll("Age:", "");
+                if (ageStr.equals(""))
+                    failedToGet.add("Age");
+                String outStr = outOf.text().replaceAll("From:", "");
+                if (outStr.equals(""))
+                    failedToGet.add("Out");
+                String heightStr = height.text().replaceAll("Height:", "");
+                if (heightStr.equals(""))
+                    failedToGet.add("Height");
+                String weightStr = weight.text().replaceAll("Weight:", "");
+                if (weightStr.equals(""))
+                    failedToGet.add("Weight");
+                Bundle result = new Bundle();
+                if (failedToGet.size() > 0) {
+
+                    result = getMartialArtsData(martialArtsUrl, failedToGet);
+                    if (!result.getString("age").equals("--"))
+                        stats.putString("age", result.getString("age"));
+                    else
+                        stats.putString("age", ageStr);
+                    if (!result.getString("height").equals("--"))
+                        stats.putString("height", result.getString("height"));
+                    else
+                        stats.putString("height", heightStr);
+                    if (!result.getString("weight").equals("--"))
+                        stats.putString("weight", result.getString("weight"));
+                    else
+                        stats.putString("weight", weightStr);
+                    if (!result.getString("out").equals("--"))
+                        stats.putString("out", result.getString("out"));
+                    else
+                        stats.putString("out", outStr);
+                    if (!result.getString("record").equals("--"))
+                        stats.putString("record", result.getString("record"));
+                    else
+                        stats.putString("record", "n/a");
+                }
+                else {
+                    stats.putString("age", ageStr);
+                    stats.putString("height", heightStr);
+                    stats.putString("weight", weightStr);
+                    stats.putString("out", outStr);
+                    stats.putString("record", "n/a");
+                }
+            }
+            else {
                 failedToGet.add("Age");
-            String outStr=outOf.text().replaceAll("From:","");
-            if(outStr.equals(""))
                 failedToGet.add("Out");
-            String heightStr=height.text().replaceAll("Height:","");
-            if(heightStr.equals(""))
                 failedToGet.add("Height");
-            String weightStr=weight.text().replaceAll("Weight:","");
-            if(weightStr.equals(""))
                 failedToGet.add("Weight");
-            ArrayList<String> result=new ArrayList<>();
-            if(failedToGet.size()>0){
-
-              result=  getMartialArtsData(martialArtsUrl,failedToGet);
+                failedToGet.add("Record");
+                stats= getMartialArtsData(martialArtsUrl,failedToGet);
             }
-            if(result.size()>0&&!result.get(0).equals("--"))
-                stats.add(result.get(0));
-                else
-            stats.add(ageStr);
-            if(result.size()>0&&!result.get(1).equals("--"))
-                stats.add(result.get(1));
-                else
-            stats.add(heightStr);
-            if(result.size()>0&&!result.get(2).equals("--"))
-                stats.add(result.get(2));
-                else
-            stats.add(weightStr);
-            if(result.size()>0&&!result.get(3).equals("--"))
-                stats.add(result.get(3));
-                else
-            stats.add(outStr);
-
             return stats;
         }
 
 
-        public ArrayList<String> getFightMatrixData(String url,boolean isFirstTime) throws IOException {
+        public Bundle getFightMatrixData(String url,boolean isFirstTime,boolean getRecord) throws IOException {
             Document document=Jsoup.connect(url).get();
-            ArrayList<String> stats=new ArrayList<>();
+            Bundle stats=new Bundle();
             String fighterUrl;
 
             Elements table=document.select("table.tblRank");
@@ -208,30 +253,34 @@ public  class Database  {
             Document fighterPage=Jsoup.connect(fighterUrl).get();
 
                 Elements proDebut=fighterPage.select("td:containsOwn(Pro Debut Date:)+td");
-                stats.add(proDebut.text());
+                  stats.putString("pro_debut",proDebut.text());
 
                 Elements currentrank=fighterPage.select("td:contains(Current Rank:) a");
                 if(currentrank.size()==0){
                     Elements lastRank=fighterPage.select("td:contains(Last Ranked:) a");
-                    stats.add(lastRank.get(0).text());
+                    stats.putString("rank",lastRank.get(0).text());
                 }
                 else {
-                    stats.add(currentrank.get(0).text());
+                    stats.putString("rank",currentrank.get(0).text());
                 }
                 Elements team=fighterPage.select("td:containsOwn(Association)+td");
-                stats.add(team.text());
+                stats.putString("team",team.text());
+                if(getRecord) {
+                    Elements record = fighterPage.select("td:containsOwn(Pro Record:)+td");
+                    stats.putString("record",record.text());
+                }
             }
             catch (Exception e){
                 if(isFirstTime) {
                     try {
-                        stats = getFightMatrixData(mFightMatrixSearchUrl + mCurrentDetailsFighter.getFirstName() + "+" + mCurrentDetailsFighter.getLastName(), false);
+                        stats = getFightMatrixData(mFightMatrixSearchUrl + mCurrentDetailsFighter.getFirstName() + "+" + mCurrentDetailsFighter.getLastName(), false,getRecord);
                     } catch (Exception e2) {
 
                     }
                     if(stats.size()==0){
-                        stats.add("n/a");
-                        stats.add("n/a");
-                        stats.add("n/a");
+                        stats.putString("pro_debut","n/a");
+                        stats.putString("rank","n/a");
+                        stats.putString("team","n/a");
                     }
                 }
 
@@ -240,75 +289,79 @@ public  class Database  {
         }
 
 
-        public ArrayList<String> getFightMetricsData(String url) throws IOException {
-            ArrayList<String> stats=new ArrayList<>();
+        public Bundle getFightMetricsData(String url,boolean isFirstTime) throws IOException {
+             Bundle stats=new Bundle();
               Document  document= (Document) Jsoup.connect(url).get();
             Elements link=new Elements();
             if(!mCurrentDetailsFighter.getNickName().equals(""))
                 link=document.select("a:matchesOwn(^"+mCurrentDetailsFighter.getNickName()+"$)");
             else
                  link=document.select("a:matchesOwn(^"+mCurrentDetailsFighter.getFirstName()+"$)");
-
-
-            String fighterUrl=link.get(0).attr("abs:href");
-
-            Document fighterPage=Jsoup.connect(fighterUrl).get();
-
-            Elements slpm=fighterPage.select("li:contains(SLpM:)");
-            stats.add(slpm.text().replace("SLpM:",""));
-            Elements sAccuracy=fighterPage.select("li:contains(Str. Acc.:)");
-            stats.add(sAccuracy.text().replace("Str. Acc.:",""));
-            Elements sapm=fighterPage.select("li:contains(SApM:)");
-            stats.add(sapm.text().replace("SApM:",""));
-            Elements sDefence=fighterPage.select("li:contains(Str. Def:)");
-            stats.add(sDefence.text().replace("Str. Def:",""));
-            Elements tAverage=fighterPage.select("li:contains(TD Avg.:)");
-            stats.add(tAverage.text().replace("TD Avg.:",""));
-            Elements tAccuracy=fighterPage.select("li:contains(TD Acc.:)");
-            stats.add(tAccuracy.text().replace("TD Acc.:",""));
-            Elements tDefence=fighterPage.select("li:contains(TD Def.:)");
-            stats.add(tDefence.text().replace("TD Def.:",""));
-            Elements submissions=fighterPage.select("li:contains(Sub. Avg.:)");
-            stats.add(submissions.text().replace("Sub. Avg.:",""));
-
-            return stats;
-        }
-        @Override
-        protected void onPostExecute(ArrayList<String> stats) {
+            if(link.size()==0)
+                link=document.select("a:containsOwn("+mCurrentDetailsFighter.getFirstName()+")");
+            if(link.size()==0)
+                link=document.select("a:containsOwn("+mCurrentDetailsFighter.getFirstName().split(" ")[0]+")");
             try {
-                FighterStats fighterStats = new FighterStats();
-                fighterStats.setmFirst(stats.get(0));
-                fighterStats.setmLast(stats.get(1));
-                fighterStats.setmAge(stats.get(2));
-                fighterStats.setmHeight(stats.get(3));
-                fighterStats.setmWeight(stats.get(4));
-                if (stats.get(5).equals(""))
-                    fighterStats.setmFightsOutOf("n/a");
-                else
-                    fighterStats.setmFightsOutOf(stats.get(5));
+                if(link.size()==0&&isFirstTime)
+                {
+                    String[] last=mCurrentDetailsFighter.getLastName().split(" ");
+                    getFightMetricsData(mFightMetricsSearchUrl+last[1],false);
+                }
+                String fighterUrl = link.get(0).attr("abs:href");
 
-                fighterStats.setmProfDebut(stats.get(6));
-                fighterStats.setmRank(stats.get(7));
-                if (stats.get(8).equals("N/A"))
-                    fighterStats.setmTeam("n/a");
-                else
-                    fighterStats.setmTeam(stats.get(8));
+                Document fighterPage = Jsoup.connect(fighterUrl).get();
 
-                fighterStats.setmSigStrikesLanded(stats.get(9));
-                fighterStats.setmSigStrikesAccuracy(stats.get(10));
-                fighterStats.setmStrikesAbsorbed(stats.get(11));
-                fighterStats.setmSigStrikesDef(stats.get(12));
-                fighterStats.setmTakeDownsLanded(stats.get(13));
-                fighterStats.setmTakeDownAccuracy(stats.get(14));
-                fighterStats.setmTakeDownDefence(stats.get(15));
-                fighterStats.setmSubmissionAttempts(stats.get(16));
-
-                notifyListeners(fighterStats);
+                Elements slpm = fighterPage.select("li:contains(SLpM:)");
+                stats.putString("slpm",slpm.text().replace("SLpM:", ""));
+                Elements sAccuracy = fighterPage.select("li:contains(Str. Acc.:)");
+                stats.putString("saccuracy",sAccuracy.text().replace("Str. Acc.:", ""));
+                Elements sapm = fighterPage.select("li:contains(SApM:)");
+                stats.putString("sapm",sapm.text().replace("SApM:", ""));
+                Elements sDefence = fighterPage.select("li:contains(Str. Def:)");
+                stats.putString("sdefence",sDefence.text().replace("Str. Def:", ""));
+                Elements tAverage = fighterPage.select("li:contains(TD Avg.:)");
+                stats.putString("taverage",tAverage.text().replace("TD Avg.:", ""));
+                Elements tAccuracy = fighterPage.select("li:contains(TD Acc.:)");
+                stats.putString("taccuracy",tAccuracy.text().replace("TD Acc.:", ""));
+                Elements tDefence = fighterPage.select("li:contains(TD Def.:)");
+                stats.putString("tdefence",tDefence.text().replace("TD Def.:", ""));
+                Elements submissions = fighterPage.select("li:contains(Sub. Avg.:)");
+                stats.putString("submission",submissions.text().replace("Sub. Avg.:", ""));
             }
             catch (Exception e){
                 e.getMessage();
-                readFighterStatsHtml(mCurrentDetailsFighter);
             }
+            return stats;
+        }
+        @Override
+        protected void onPostExecute(Bundle bundle) {
+            Bundle basicinfo=bundle.getBundle("basic_info");
+            Bundle ranks=bundle.getBundle("ranks");
+            Bundle stats=bundle.getBundle("stats");
+
+            FighterStats fighterStats=new FighterStats();
+            fighterStats.setmFirst(basicinfo.getString("first"));
+            fighterStats.setmLast(basicinfo.getString("last"));
+            fighterStats.setmAge(basicinfo.getString("age"));
+            fighterStats.setmHeight(basicinfo.getString("height"));
+            fighterStats.setmWeight(basicinfo.getString("weight"));
+            fighterStats.setmFightsOutOf(basicinfo.getString("out"));
+            fighterStats.setmProfRecord(basicinfo.getString("record"));
+
+            fighterStats.setmRank(ranks.getString("rank"));
+            fighterStats.setmTeam(ranks.getString("team"));
+            fighterStats.setmProfDebut(ranks.getString("pro_debut"));
+
+            fighterStats.setmSigStrikesLanded(stats.getString("slpm"));
+            fighterStats.setmSigStrikesAccuracy(stats.getString("saccuracy"));
+            fighterStats.setmStrikesAbsorbed(stats.getString("sapm"));
+            fighterStats.setmSigStrikesDef(stats.getString("sdefence"));
+
+            fighterStats.setmTakeDownsLanded(stats.getString("taverage"));
+            fighterStats.setmTakeDownAccuracy(stats.getString("taccuracy"));
+            fighterStats.setmTakeDownDefence(stats.getString("tdefence"));
+            fighterStats.setmSubmissionAttempts(stats.getString("submission"));
+            notifyListeners(fighterStats);
         }
     }
 
@@ -332,7 +385,7 @@ public  class Database  {
         @Override
         public void execute(String json) {
             try {
-                mFighters=new ArrayList<Fighter>();
+                mUFCfighters =new ArrayList<Fighter>();
                 JSONArray jsonArray=new JSONArray(json);
                 int length=jsonArray.length();
                 for (int i=0;i<jsonArray.length();i++){
@@ -376,7 +429,7 @@ public  class Database  {
                         fighter.setId(-1);
                     }
 
-                    mFighters.add(fighter);
+                    mUFCfighters.add(fighter);
                 }
                 NotifyListeners(true);
             } catch (JSONException e) {
@@ -410,21 +463,12 @@ public  class Database  {
         reader.execute();
     }
 
-    public class AllTimeRanksJsoupReader extends AsyncTask<Void,Void,Void>{
+    public class AllTimeRanksJsoupReader extends AsyncTask<Void,ArrayList<String>,ArrayList<String>>{
 
         @Override
-        protected Void doInBackground(Void... voids) {
+        protected ArrayList<String> doInBackground(Void... voids) {
+
             ArrayList<String> allTime=new ArrayList<>();
-            ArrayList<String> women=new ArrayList<>();
-            ArrayList<String> heavy=new ArrayList<>();
-            ArrayList<String> lightheavy=new ArrayList<>();
-            ArrayList<String> middle=new ArrayList<>();
-            ArrayList<String> welter=new ArrayList<>();
-            ArrayList<String> light=new ArrayList<>();
-            ArrayList<String> feather=new ArrayList<>();
-            ArrayList<String> bantam=new ArrayList<>();
-            ArrayList<String> fly=new ArrayList<>();
-            ArrayList<String> straw=new ArrayList<>();
 
 
             try {
@@ -432,65 +476,126 @@ public  class Database  {
                 Elements alltimeTable=document.select("td:matches(Absolute)");
                 Elements allTimenames=alltimeTable.select("strong");
                 for (int i=0;i<allTimenames.size();i++){
-                    allTime.add(allTimenames.get(i).text());
+                    allTime.add("Absolute "+allTimenames.get(i).text());
                 }
                 Elements womenTable=document.select("td:matches(Women)");
                 Elements womennames=womenTable.select("strong");
                 for (int i=0;i<womennames.size();i++)
-                    women.add(womennames.get(i).text());
+                    allTime.add("Women "+womennames.get(i).text());
 
                 Elements heavyTable=document.select("td:matches(Heavyweight +)");
                 Elements heavynames=heavyTable.get(0).select("strong");
                 for (int i=0;i<heavynames.size();i++)
-                    heavy.add(heavynames.get(i).text());
+                    allTime.add("Heavyweight "+heavynames.get(i).text());
 
                 Elements lightheavyTable=document.select("td:matches(Light Heavyweight)");
                 Elements lightheavynames=lightheavyTable.select("strong");
                 for (int i=0;i<heavynames.size();i++)
-                    lightheavy.add(lightheavynames.get(i).text());
+                    allTime.add("Light_Heavyweight "+lightheavynames.get(i).text());
 
                 Elements middleTable=document.select("td:matches(Middleweight)");
                 Elements middlenames=middleTable.select("strong");
                 for (int i=0;i<heavynames.size();i++)
-                    middle.add(middlenames.get(i).text());
+                    allTime.add("MiddleWeight "+middlenames.get(i).text());
 
                 Elements welterTable=document.select("td:matches(Welterweight)");
                 Elements welternames=welterTable.select("strong");
                 for (int i=0;i<welternames.size();i++)
-                    welter.add(welternames.get(i).text());
+                    allTime.add("Welterweight "+welternames.get(i).text());
 
                 Elements lightTable=document.select("td:matches(Lightweight)");
                 Elements lightnames=lightTable.select("strong");
                 for (int i=0;i<lightnames.size();i++)
-                    light.add(welternames.get(i).text());
+                    allTime.add("Lightweight "+lightnames.get(i).text());
 
                 Elements featherTable=document.select("td:matches(Featherweight)");
                 Elements feathernames=featherTable.select("strong");
                 for (int i=0;i<feathernames.size();i++)
-                    feather.add(feathernames.get(i).text());
+                    allTime.add("Featherweight "+feathernames.get(i).text());
 
                 Elements bantamTable=document.select("td:matches(Bantamweight)");
                 Elements bantamnames=bantamTable.select("strong");
                 for (int i=0;i<bantamnames.size();i++)
-                    bantam.add(bantamnames.get(i).text());
+                    allTime.add("Bantamweight "+bantamnames.get(i).text());
 
                 Elements flyweightable=document.select("td:matches(Flyweight)");
                 Elements flynames=flyweightable.select("strong");
                 for (int i=0;i<flynames.size();i++)
-                    fly.add(bantamnames.get(i).text());
+                    allTime.add("Flyweight "+flynames.get(i).text());
 
-                Elements strawweighttable=document.select("td:matches(Strawweight)");
-                Elements strawnames=strawweighttable.select("strong");
-                for (int i=0;i<strawnames.size();i++)
-                    straw.add(strawnames.get(i).text());
 
             } catch (IOException e) {
                 e.getMessage();
             }
 
 
-            return null;
+            return allTime;
         }
+
+        @Override
+        protected void onPostExecute(ArrayList<String> strings) {
+            mAllTimeFighters=new ArrayList<>();
+            for (int i=0;i<strings.size();i++){
+                String string=strings.get(i);
+                String[] weightClassAndName=string.split(" ",2);
+                String weightclass=weightClassAndName[0];
+                string=weightClassAndName[1];
+                string=string.replaceAll("Georges St. Pierre","Georges St-Pierre");
+                string=string.replaceAll("Quinton","Rampage");
+                string=string.replaceAll("B.J.","BJ");
+                string=string.replaceAll("Cristiane Justino","Cris Cyborg");
+                string=string.replaceAll("T.J.","TJ");
+                String[] firstAndLast=string.split(" ");
+                if(string.equals("Antonio Rodrigo Nogueira")) {
+                    firstAndLast[0] = "Antonio Rogerio";
+                    firstAndLast[1] = "Nogueira";
+                }
+                if(string.contains(" dos ")){
+                   string= string.replaceAll("dos","Dos");
+                    firstAndLast=string.split(" ",2);
+                }
+                if(string.equals("Mirko Filipovic")){
+                    firstAndLast[0]="Mirko";
+                    firstAndLast[1]="Cro Cop";
+                }
+                boolean found=false;
+                for (Fighter fighter:mUFCfighters){
+                    if(firstAndLast[0].equals(fighter.getFirstName())&&firstAndLast[1].equals(fighter.getLastName())){
+                        found=true;
+                        mAllTimeFighters.add(fighter);
+                    }
+                }
+                if(!found)
+                {
+                    Fighter currentFighter=new Fighter();
+                    if(firstAndLast.length==3) {
+                        currentFighter.setFirstName(firstAndLast[0] + " " + firstAndLast[1]);
+                        currentFighter.setLastName(firstAndLast[2]);
+                    }
+                    else {
+                        currentFighter.setFirstName(firstAndLast[0]);
+                        currentFighter.setLastName(firstAndLast[1]);
+                    }
+                    currentFighter.setProfileUrl("default");
+                    currentFighter.setFullBodyUrl("default");
+                    currentFighter.setmWeightClass(weightclass);
+                    currentFighter.setNickName("");
+                    mAllTimeFighters.add(currentFighter);
+                }
+            }
+
+            notifyAllTimeDataListeners();
+        }
+
+    }
+
+    public void notifyAllTimeDataListeners(){
+        for (AllTimeDataListener listener:mAllTimeDataListeners)
+            listener.OnAllTimeDataReceived();
+    }
+
+    public interface AllTimeDataListener {
+        void OnAllTimeDataReceived();
     }
 
 }

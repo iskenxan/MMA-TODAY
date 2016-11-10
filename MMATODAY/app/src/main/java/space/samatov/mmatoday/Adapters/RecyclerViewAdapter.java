@@ -25,10 +25,12 @@ import space.samatov.mmatoday.model.OnListItemClicked;
 public class RecyclerViewAdapter extends RecyclerView.Adapter implements List_Fragment.RecyclerViewDataChangedListener {
 
     private ArrayList<ListItem> mFighters;
+    private boolean mIsUFCList=false;
     private ArrayList<OnListItemClicked> mListeners =new ArrayList<>();
-    public RecyclerViewAdapter(ArrayList<ListItem> fighters, OnListItemClicked listener){
+    public RecyclerViewAdapter(ArrayList<ListItem> fighters, OnListItemClicked listener, boolean isUFCList){
         mFighters=fighters;
         mListeners.add(listener);
+        mIsUFCList=isUFCList;
     }
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -66,7 +68,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter implements List_Fr
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         ListViewHolder currentHolder= (ListViewHolder) holder;
 
-        if(position==0)
+        if(position==0&&mIsUFCList)
             ((ChampViewHolder)holder).bindView( position);
         else if(currentHolder.isHeader())
             ((HeaderViewHolder)holder).bindView( position);
@@ -87,7 +89,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter implements List_Fr
 
     @Override
     public int getItemViewType(int position) {
-        if(position==0)//champions are always first in the list
+        if(position==0&&mIsUFCList)//champions are always first in the list
             return 2;
         ListItem item=mFighters.get(position);
         if(item.isGroupHeader())
@@ -158,6 +160,13 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter implements List_Fr
         public void bindView(int position){
             final ListItem item=mFighters.get(position);
             Fighter fighter=(Fighter)item;
+            if(fighter.getProfileUrl().equals("default")) {
+                if(fighter.getmWeightClass().equals("Women"))
+                    mImageView.setImageResource(R.drawable.fighter_profile_women_default);
+                else
+                mImageView.setImageResource(R.drawable.fighter_profile_default);
+            }
+            else
             Glide.with(itemView.getContext()).load(fighter.getProfileUrl()).override(150,150).diskCacheStrategy(DiskCacheStrategy.RESULT).into(mImageView);
             mTextView.setText(fighter.getFirstName()+" "+fighter.getLastName());
             mIndex=position;
@@ -190,6 +199,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter implements List_Fr
             final ListItem item=mFighters.get(position);
             Fighter fighter=(Fighter)item;
             mTextView.setText(fighter.getFirstName()+" "+fighter.getLastName());
+
             Glide.with(itemView.getContext()).load(fighter.getmBeltProfileUrl()).override(500,500).diskCacheStrategy(DiskCacheStrategy.RESULT).into(mImageView);
             mIndex=position;
         }

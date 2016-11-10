@@ -22,6 +22,7 @@ public class FighterStats {
     private String mSigStrikesDef;
     private String mProfDebut;
     private String mRank;
+    private String mProfRecord;
 
     public String getmFirst() {
         return mFirst;
@@ -181,5 +182,13 @@ public class FighterStats {
 
     public void setmRank(String mRank) {
         this.mRank = mRank;
+    }
+
+    public String getmProfRecord() {
+        return mProfRecord;
+    }
+
+    public void setmProfRecord(String mProfRecord) {
+        this.mProfRecord = mProfRecord;
     }
 }

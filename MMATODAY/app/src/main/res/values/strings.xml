@@ -24,4 +24,25 @@
         <item>Women Strawweight"</item>
         <item>Women Bantamweight</item>
     </string-array>
+
+    <string-array name="all_time_rank_array">
+        <item>Absolute</item>
+        <item>Women"</item>
+        <item>Heavyweight</item>
+        <item>Light Heavyweight</item>
+        <item>Middleweight</item>
+        <item>Welterweight</item>
+        <item>Lightweight</item>
+        <item>Featherweight</item>
+        <item>Bantamweight</item>
+        <item>Flyweight</item>
+
+
+
+
+
+
+
+
+    </string-array>
 </resources>

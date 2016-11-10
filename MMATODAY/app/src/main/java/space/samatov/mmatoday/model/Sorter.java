@@ -91,6 +91,77 @@ public class Sorter {
         return list;
     }
 
+    public static ArrayList<ListItem> getSpinnerSelectedDivisionAllTimeRanks(int spinnerPosition,ArrayList<Fighter> fighters){
+        ArrayList<ListItem> list=new ArrayList<>();
+
+        switch (spinnerPosition){
+            case 0:{
+                for (int i=0;i<24;i++){
+                    list.add(fighters.get(i));
+                }
+                break;
+            }
+            case 1:{
+                for (int i=25;i<49;i++){
+                    list.add(fighters.get(i));
+                }
+                break;
+            }
+            case 2:{
+                for (int i=50;i<74;i++){
+                    list.add(fighters.get(i));
+                }
+                break;
+            }
+            case 3:{
+                for (int i=75;i<99;i++){
+                    list.add(fighters.get(i));
+                }
+                break;
+            }
+            case 4:{
+                for (int i=100;i<124;i++){
+                    list.add(fighters.get(i));
+                }
+                break;
+            }
+            case 5:{
+                for (int i=125;i<149;i++){
+                    list.add(fighters.get(i));
+                }
+                break;
+            }
+            case 6:{
+                for (int i=150;i<174;i++){
+                    list.add(fighters.get(i));
+                }
+                break;
+            }
+            case 7:{
+                for (int i=175;i<199;i++){
+                    list.add(fighters.get(i));
+                }
+                break;
+            }
+            case 8:{
+                for (int i=200;i<224;i++){
+                    list.add(fighters.get(i));
+                }
+                break;
+            }
+            case 9:{
+                for (int i=225;i<249;i++){
+                    list.add(fighters.get(i));
+                }
+                break;
+            }
+            default:
+                break;
+        }
+
+        return list;
+    }
+
     public static  ArrayList<ListItem> sortAlphabetically(ArrayList<ListItem> fighters){
         ArrayList<ListItem> list=fighters;
          Comparator<ListItem> ALPHABETICAL_ORDER = new Comparator<ListItem>() {

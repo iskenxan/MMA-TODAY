@@ -86,7 +86,7 @@ public class FighterDetailsFragment extends Fragment implements Database.StatsDa
     }
 
     @Override
-    public void OnDataReceived(FighterStats fighterStats) {
+    public void OnDataReceived(final FighterStats fighterStats) {
         mFighterStats=fighterStats;
 
         getActivity().runOnUiThread(new Runnable() {
@@ -95,7 +95,10 @@ public class FighterDetailsFragment extends Fragment implements Database.StatsDa
                 mFirstTextView.setText(mFighterStats.getmFirst());
                 mLastTextView.setText(mFighterStats.getmLast());
                 mNicknameTextView.setText(mFighter.getNickName());
+                if(mFighter.ismIsUFC())
                 mRecordsTextView.setText(mFighter.getWins()+"-"+mFighter.getLosses()+"-"+mFighter.getDraws());
+                else
+                mRecordsTextView.setText(fighterStats.getmProfRecord().replace("(Win-Loss-Draw)",""));
                 mAgeTextView.setText(mFighterStats.getmAge());
                 mWeightClassTextView.setText(mFighter.getmWeightClass());
                 mWeightTextView.setText(mFighterStats.getmWeight());
@@ -115,7 +118,7 @@ public class FighterDetailsFragment extends Fragment implements Database.StatsDa
                 mSubmissionTextView.setText(mFighterStats.getmSubmissionAttempts());
 
 
-                if(!mFighter.getFullBodyUrl().equals("default"))
+                if(!mFighter.getFullBodyUrl().equals("default")&&!mFighter.getFullBodyUrl().equals(""))
                     Glide.with(getActivity()).load(mFighter.getFullBodyUrl()).into(mImageView);
                 else
                     mImageView.setImageResource(R.drawable.default_fighter_full_body);

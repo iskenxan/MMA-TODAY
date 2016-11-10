@@ -12,44 +12,53 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+
 import samatov.space.mmatoday.R;
+import space.samatov.mmatoday.Fragments.AllTimeRanksFragment;
 import space.samatov.mmatoday.Fragments.FighterDetailsFragment;
-import space.samatov.mmatoday.Fragments.List_Fragment;
+import space.samatov.mmatoday.Fragments.LoadingFragment;
 import space.samatov.mmatoday.Fragments.ViewPagerFragment;
 import space.samatov.mmatoday.model.Database;
 import space.samatov.mmatoday.model.Fighter;
-import space.samatov.mmatoday.model.FighterStats;
 import space.samatov.mmatoday.model.OnListItemClicked;
 
-public class MainActivity extends AppCompatActivity implements Database.DataListener,OnListItemClicked {
+public class MainActivity extends AppCompatActivity implements Database.DataListener, OnListItemClicked, Database.AllTimeDataListener {
     private Database mDatabase;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        LoadingFragment loadingFragment = new LoadingFragment();
         setContentView(R.layout.activity_main);
+
+        fragmentManager.beginTransaction().add(R.id.mainPlaceholder, loadingFragment, LoadingFragment.FRAGMENT_KEY).commit();
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        mDatabase=new Database();
+        mDatabase = new Database();
         mDatabase.addListener(this);
-        mDatabase.readAllTimeRanks();
+        mDatabase.addAllTimeRankListener(this);
+        mDatabase.getFightersData();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater=getMenuInflater();
-        inflater.inflate(R.menu.menu_main,menu);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_main, menu);
 
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int itemId=item.getItemId();
-        switch (itemId){
-            case R.id.ufcFightersListItem:{
-                if(isConnected())
-                    mDatabase.getFightersData();
+        int itemId = item.getItemId();
+        switch (itemId) {
+            case R.id.ufcFightersListItem: {
+                if (isConnected())
+                    startViewPagerFragment();
                 else
                     DisplayErrorMessage();
                 return true;
@@ -59,21 +68,21 @@ public class MainActivity extends AppCompatActivity implements Database.DataList
         }
     }
 
-    public void startViewPagerFragment(){
+    public void startViewPagerFragment() {
 
-        FragmentManager fragmentManager=getSupportFragmentManager();
-        ViewPagerFragment savedFragmentInstance= (ViewPagerFragment) fragmentManager.findFragmentByTag(ViewPagerFragment.FRAGMENT_KEY);
-        if(savedFragmentInstance==null) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        ViewPagerFragment savedFragmentInstance = (ViewPagerFragment) fragmentManager.findFragmentByTag(ViewPagerFragment.FRAGMENT_KEY);
+        if (savedFragmentInstance == null) {
             ViewPagerFragment viewPagerFragment = new ViewPagerFragment();
             Bundle bundle = new Bundle();
-            bundle.putParcelableArrayList("fighters", mDatabase.mFighters);
+            bundle.putParcelableArrayList("fighters", mDatabase.mUFCfighters);
             viewPagerFragment.setArguments(bundle);
-            fragmentManager.beginTransaction().add(R.id.mainPlaceholder, viewPagerFragment, ViewPagerFragment.FRAGMENT_KEY).commit();
+            fragmentManager.beginTransaction().replace(R.id.mainPlaceholder, viewPagerFragment, ViewPagerFragment.FRAGMENT_KEY).commit();
         }
     }
 
 
-    public boolean isConnected(){
+    public boolean isConnected() {
         ConnectivityManager connectivityManager
                 = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
@@ -81,19 +90,18 @@ public class MainActivity extends AppCompatActivity implements Database.DataList
     }
 
 
-
     private void DisplayErrorMessage() {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(MainActivity.this,"Error retrieving data from the server",Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this, "Error retrieving data from the server", Toast.LENGTH_LONG).show();
             }
         });
     }
 
     @Override
     public void onDataReceived() {
-        startViewPagerFragment();
+        mDatabase.readAllTimeRanks();
     }
 
     @Override
@@ -103,13 +111,30 @@ public class MainActivity extends AppCompatActivity implements Database.DataList
 
     @Override
     public void OnListItemSelected(Fighter fighter) {
-        FighterDetailsFragment fragment=new FighterDetailsFragment();
-        FragmentManager fragmentManager=getSupportFragmentManager();
+        FighterDetailsFragment fragment = new FighterDetailsFragment();
+        FragmentManager fragmentManager = getSupportFragmentManager();
 
-        Bundle args=new Bundle();
-        args.putParcelable("fighter",fighter);
+        Bundle args = new Bundle();
+        args.putParcelable("fighter", fighter);
         fragment.setArguments(args);
-        fragmentManager.beginTransaction().replace(R.id.mainPlaceholder,fragment,FighterDetailsFragment.FRAGMENT_KEY)
+        fragmentManager.beginTransaction().replace(R.id.mainPlaceholder, fragment, FighterDetailsFragment.FRAGMENT_KEY)
                 .addToBackStack(null).commit();
+    }
+
+
+    @Override
+    public void OnAllTimeDataReceived() {
+     startAllTimeRankFragment();
+    }
+
+    public void startAllTimeRankFragment(){
+        AllTimeRanksFragment fragment=new AllTimeRanksFragment();
+
+        FragmentManager fragmentManager=getSupportFragmentManager();
+        Bundle args=new Bundle();
+        args.putParcelableArrayList("fighters",mDatabase.mAllTimeFighters);
+
+        fragment.setArguments(args);
+        fragmentManager.beginTransaction().replace(R.id.mainPlaceholder,fragment,AllTimeRanksFragment.FRAGMENT_KEY).commit();
     }
 }
