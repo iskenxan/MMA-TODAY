@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="200dp"
+    tools:background="@color/colorAccent"
+    android:paddingTop="20dp"
+    android:paddingBottom="15dp">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="16dp"
+        tools:text="UFC 205: Gastelum misses weight, Cerrone fight scrapped"
+        android:paddingRight="10dp"
+        android:paddingLeft="10dp"
+        android:id="@+id/newsFeedTitle"
+        android:paddingBottom="4dp"
+        android:textStyle="bold"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="120dp"
+            android:layout_weight="1"
+            tools:src="@drawable/newsfeed_example"
+            android:id="@+id/newsFeedImageView"/>
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="120dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="6"
+                android:textSize="14sp"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
+                android:id="@+id/newsFeedblurb"
+                tools:text="UFC president Dana White doesn’t expect Eddie Alvarez to want to trade strikes on the feet with Conor McGregor at UFC 205 this weekend."/>
+            <TextView
+                android:layout_marginTop="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                tools:text="by Nick Baldwin"
+                android:id="@+id/newsFeedAuthor"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"/>
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

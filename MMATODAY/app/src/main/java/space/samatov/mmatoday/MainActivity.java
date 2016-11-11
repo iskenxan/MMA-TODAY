@@ -21,6 +21,7 @@ import space.samatov.mmatoday.Fragments.LoadingFragment;
 import space.samatov.mmatoday.Fragments.ViewPagerFragment;
 import space.samatov.mmatoday.model.Database;
 import space.samatov.mmatoday.model.Fighter;
+import space.samatov.mmatoday.model.NewsReader;
 import space.samatov.mmatoday.model.OnListItemClicked;
 
 public class MainActivity extends AppCompatActivity implements Database.DataListener, OnListItemClicked, Database.AllTimeDataListener {
@@ -41,7 +42,11 @@ public class MainActivity extends AppCompatActivity implements Database.DataList
         mDatabase = new Database();
         mDatabase.addListener(this);
         mDatabase.addAllTimeRankListener(this);
-        mDatabase.getFightersData();
+
+        NewsReader newsReader=new NewsReader();
+        newsReader.getNewsFeed();
+
+
     }
 
     @Override
