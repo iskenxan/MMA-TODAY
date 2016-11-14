@@ -18,6 +18,11 @@ public class NewsReader {
 
     public ArrayList<Article> mNewsFeed=new ArrayList<>();
 
+    public ArrayList<NewsFeedListener> mListeners=new ArrayList<>();
+
+    public void addListener(NewsFeedListener listener){
+        mListeners.add(listener);
+    }
     public  void getNewsFeed(){
         NewsFeedReader reader=new NewsFeedReader();
         reader.execute();
@@ -32,9 +37,10 @@ public class NewsReader {
             try {
                 Document document= Jsoup.connect(mArticleUrl).get();
                 Elements articleList=document.select("div.m-block__body ");
+                Elements images=document.select("div.m-block__image noscript>img");
 
-
-                for(Element element:articleList){
+                for(int i=0;i<articleList.size();i++){
+                    Element element=articleList.get(i);
                     Article article=new Article();
                     Elements title=element.select("h3");
                     article.setmHeadline(title.text());
@@ -46,6 +52,16 @@ public class NewsReader {
                     article.setUrl(url.attr("abs:href"));
                     Elements date=element.select("div.m-block__body__byline");
                     article.setmDate(date.get(0).ownText());
+                    article.setmImageUrl(images.get(i).attr("abs:src"));
+
+                    Document articleDetail=Jsoup.connect(article.getUrl()).get();
+
+                    Elements content=articleDetail.select("div.c-entry-content>p");
+                    ArrayList<String> paragraphs=new ArrayList<>();
+                    for (Element cont:content)
+                    paragraphs.add(cont.text());
+
+                    article.setContent(paragraphs);
                     articles.add(article);
                 }
 
@@ -56,5 +72,24 @@ public class NewsReader {
 
             return articles;
         }
+
+        @Override
+        protected void onPostExecute(ArrayList<Article> articles) {
+            mNewsFeed=articles;
+            notifyListeners();
+            super.onPostExecute(articles);
+        }
+
+    }
+
+    public void notifyListeners(){
+        for(NewsFeedListener listener:mListeners){
+            listener.OnNewsFeedReceived();
+        }
+    }
+
+
+    public interface  NewsFeedListener{
+        public void OnNewsFeedReceived();
     }
 }

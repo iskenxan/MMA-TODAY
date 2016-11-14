@@ -4,15 +4,17 @@ package space.samatov.mmatoday.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.ArrayList;
+
 public class Article implements Parcelable {
 
     private String mHeadline;
     private String mAuthor;
     private String mDate;
     private String mDescription;
-    private String mContent;
+    private ArrayList<String> mContent;
     private String mUrl;
-
+    private String mImageUrl;
     public  Article(){}
     public String getmHeadline() {
         return mHeadline;
@@ -46,11 +48,11 @@ public class Article implements Parcelable {
         this.mDescription = mDescription;
     }
 
-    public String getContent() {
+    public ArrayList<String> getContent() {
         return mContent;
     }
 
-    public void setContent(String content) {
+    public void setContent(ArrayList<String> content) {
         mContent = content;
     }
 
@@ -67,12 +69,20 @@ public class Article implements Parcelable {
         return 0;
     }
 
+    public String getmImageUrl() {
+        return mImageUrl;
+    }
+
+    public void setmImageUrl(String mImageUrl) {
+        this.mImageUrl = mImageUrl;
+    }
+
     @Override
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeString(mHeadline);
         parcel.writeString(mAuthor);
         parcel.writeString(mUrl);
-        parcel.writeString(mContent);
+        parcel.writeList(mContent);
         parcel.writeString(mDate);
         parcel.writeString(mDescription);
     }
@@ -93,7 +103,7 @@ public class Article implements Parcelable {
         mHeadline=in.readString();
         mAuthor=in.readString();
         mUrl=in.readString();
-        mContent=in.readString();
+        in.readList(mContent,null);
         mDate=in.readString();
         mDescription=in.readString();
     }

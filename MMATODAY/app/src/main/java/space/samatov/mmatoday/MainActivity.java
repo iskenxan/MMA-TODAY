@@ -16,17 +16,20 @@ import java.util.ArrayList;
 
 import samatov.space.mmatoday.R;
 import space.samatov.mmatoday.Fragments.AllTimeRanksFragment;
+import space.samatov.mmatoday.Fragments.ArticleDetailsFragment;
 import space.samatov.mmatoday.Fragments.FighterDetailsFragment;
 import space.samatov.mmatoday.Fragments.LoadingFragment;
+import space.samatov.mmatoday.Fragments.NewsfeedFragment;
 import space.samatov.mmatoday.Fragments.ViewPagerFragment;
 import space.samatov.mmatoday.model.Database;
 import space.samatov.mmatoday.model.Fighter;
 import space.samatov.mmatoday.model.NewsReader;
 import space.samatov.mmatoday.model.OnListItemClicked;
+import space.samatov.mmatoday.model.OnNewsFeedItemClicked;
 
-public class MainActivity extends AppCompatActivity implements Database.DataListener, OnListItemClicked, Database.AllTimeDataListener {
+public class MainActivity extends AppCompatActivity implements OnNewsFeedItemClicked, Database.DataListener, OnListItemClicked, Database.AllTimeDataListener,NewsReader.NewsFeedListener {
     private Database mDatabase;
-
+    private NewsReader mNewsReader;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,10 +46,10 @@ public class MainActivity extends AppCompatActivity implements Database.DataList
         mDatabase.addListener(this);
         mDatabase.addAllTimeRankListener(this);
 
-        NewsReader newsReader=new NewsReader();
-        newsReader.getNewsFeed();
+        mNewsReader=new NewsReader();
+        mNewsReader.addListener(this);
 
-
+        mNewsReader.getNewsFeed();
     }
 
     @Override
@@ -141,5 +144,26 @@ public class MainActivity extends AppCompatActivity implements Database.DataList
 
         fragment.setArguments(args);
         fragmentManager.beginTransaction().replace(R.id.mainPlaceholder,fragment,AllTimeRanksFragment.FRAGMENT_KEY).commit();
+    }
+
+    @Override
+    public void OnNewsFeedReceived() {
+        FragmentManager fragmentManager=getSupportFragmentManager();
+        NewsfeedFragment newsfeedFragment=new NewsfeedFragment();
+        Bundle args=new Bundle();
+        args.putParcelableArrayList("news_feed",mNewsReader.mNewsFeed);
+        newsfeedFragment.setArguments(args);
+        fragmentManager.beginTransaction().replace(R.id.mainPlaceholder,newsfeedFragment,NewsfeedFragment.FRAGMENT_KEY).commit();
+    }
+
+    @Override
+    public void OnNewsFeedItemClicked(int position) {
+        FragmentManager fragmentManager=getSupportFragmentManager();
+        ArticleDetailsFragment fragment=new ArticleDetailsFragment();
+        Bundle args=new Bundle();
+        args.putParcelable("article",mNewsReader.mNewsFeed.get(position));
+        fragment.setArguments(args);
+
+        fragmentManager.beginTransaction().replace(R.id.mainPlaceholder,fragment,ArticleDetailsFragment.FRAGMENT_KEY).addToBackStack(null).commit();
     }
 }

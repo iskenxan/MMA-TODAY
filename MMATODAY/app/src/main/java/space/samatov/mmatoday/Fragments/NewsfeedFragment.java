@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import samatov.space.mmatoday.R;
 import space.samatov.mmatoday.Adapters.NewsFeedAdapter;
 import space.samatov.mmatoday.model.Article;
+import space.samatov.mmatoday.model.OnNewsFeedItemClicked;
 
 public class NewsfeedFragment extends Fragment {
 
@@ -27,13 +28,13 @@ public class NewsfeedFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view=inflater.inflate(R.layout.fragment_list,container,false);
-        mArticles=getArguments().getParcelableArrayList("newsfeed");
+        mArticles=getArguments().getParcelableArrayList("news_feed");
         mRecyclerView= (RecyclerView) view.findViewById(R.id.listRecyclerView);
 
         RecyclerView.LayoutManager layoutManager=new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(layoutManager);
 
-        NewsFeedAdapter adapter=new NewsFeedAdapter(mArticles);
+        NewsFeedAdapter adapter=new NewsFeedAdapter(mArticles,(OnNewsFeedItemClicked)getActivity());
         mRecyclerView.setAdapter(adapter);
 
         return view;

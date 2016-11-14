@@ -10,21 +10,22 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
 import samatov.space.mmatoday.R;
 import space.samatov.mmatoday.model.Article;
-import space.samatov.mmatoday.model.ListItem;
-import space.samatov.mmatoday.model.OnListItemClicked;
+import space.samatov.mmatoday.model.NewsReader;
+import space.samatov.mmatoday.model.OnNewsFeedItemClicked;
 
 public class NewsFeedAdapter extends RecyclerView.Adapter {
 
     private ArrayList<Article> mArticles;
+    private ArrayList<OnNewsFeedItemClicked> mListeners=new ArrayList<>();
 
-    public NewsFeedAdapter(ArrayList<Article> articles){
+    public NewsFeedAdapter(ArrayList<Article> articles,OnNewsFeedItemClicked listener){
         mArticles=articles;
+        mListeners.add(listener);
     }
 
     @Override
@@ -48,14 +49,16 @@ public class NewsFeedAdapter extends RecyclerView.Adapter {
 
 
 
-    public class  ViewHolder extends RecyclerView.ViewHolder{
+    public class  ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         TextView mTitle;
         TextView mBlurb;
         TextView mAuthor;
         ImageView mImage;
+        private int mIndex;
 
         public ViewHolder(View itemView) {
             super(itemView);
+            itemView.setOnClickListener(this);
             mTitle= (TextView) itemView.findViewById(R.id.newsFeedTitle);
             mBlurb= (TextView) itemView.findViewById(R.id.newsFeedblurb);
             mAuthor= (TextView) itemView.findViewById(R.id.newsFeedAuthor);
@@ -69,7 +72,18 @@ public class NewsFeedAdapter extends RecyclerView.Adapter {
             mTitle.setText(article.getmHeadline());
             mBlurb.setText(article.getmDescription());
             mAuthor.setText("by "+article.getmAuthor());
-            Glide.with(itemView.getContext()).load(article.getUrl()).into(mImage);
+            Glide.with(itemView.getContext()).load(article.getmImageUrl()).into(mImage);
+            mIndex=position;
         }
+
+        @Override
+        public void onClick(View view) {
+            notifyListeners(mIndex);
+        }
+    }
+
+    private void notifyListeners(int position){
+        for (OnNewsFeedItemClicked listener:mListeners)
+            listener.OnNewsFeedItemClicked(position);
     }
 }
