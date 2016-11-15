@@ -9,6 +9,11 @@
     <string name="octagon_girls">Octagon girls</string>
     <string name="quiz">Quizzes</string>
 
+    <string name="hello_world">Hello world!</string>
+    <string name="player_error">Error initializing YouTube player</string>
+    <string name="seek_to">Jump To</string>
+    <string name="seek_to_hint">Seconds</string>
+
 
     <string-array name="men_weightclass_array">
         <item>Flyweight</item>

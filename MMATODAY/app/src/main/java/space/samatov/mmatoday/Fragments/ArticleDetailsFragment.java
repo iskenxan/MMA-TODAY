@@ -25,7 +25,6 @@ public class ArticleDetailsFragment  extends Fragment{
     private TextView mAuthorTextView;
     private TextView mTittleTextView;
     private TextView mContentTextView;
-    private LinearLayout mLinearLayout;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -36,7 +35,6 @@ public class ArticleDetailsFragment  extends Fragment{
         mImageView= (ImageView) view.findViewById(R.id.articleImageView);
         mAuthorTextView= (TextView) view.findViewById(R.id.articleAuthorTextView);
         mTittleTextView= (TextView) view.findViewById(R.id.articleTittleTextView);
-        mLinearLayout= (LinearLayout) view.findViewById(R.id.articleLinearLayout);
         mContentTextView= (TextView) view.findViewById(R.id.articleContentTextView);
         Glide.with(getActivity()).load(mArticle.getmImageUrl()).into(mImageView);
         mTittleTextView.setText(mArticle.getmHeadline());

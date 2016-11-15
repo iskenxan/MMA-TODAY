@@ -1,6 +1,7 @@
 package space.samatov.mmatoday;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -12,6 +13,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.google.android.youtube.player.YouTubeApiServiceUtil;
+import com.google.android.youtube.player.YouTubeInitializationResult;
+
 import java.util.ArrayList;
 
 import samatov.space.mmatoday.R;
@@ -21,13 +25,17 @@ import space.samatov.mmatoday.Fragments.FighterDetailsFragment;
 import space.samatov.mmatoday.Fragments.LoadingFragment;
 import space.samatov.mmatoday.Fragments.NewsfeedFragment;
 import space.samatov.mmatoday.Fragments.ViewPagerFragment;
+import space.samatov.mmatoday.Fragments.YouTubeNewsFragment;
 import space.samatov.mmatoday.model.Database;
 import space.samatov.mmatoday.model.Fighter;
 import space.samatov.mmatoday.model.NewsReader;
 import space.samatov.mmatoday.model.OnListItemClicked;
 import space.samatov.mmatoday.model.OnNewsFeedItemClicked;
+import space.samatov.mmatoday.model.OnYouTubeThumbnailClicked;
+import space.samatov.mmatoday.model.YoutubeVideo;
 
-public class MainActivity extends AppCompatActivity implements OnNewsFeedItemClicked, Database.DataListener, OnListItemClicked, Database.AllTimeDataListener,NewsReader.NewsFeedListener {
+public class MainActivity extends AppCompatActivity implements OnYouTubeThumbnailClicked, OnNewsFeedItemClicked,
+        Database.DataListener, OnListItemClicked, Database.AllTimeDataListener,NewsReader.NewsFeedListener {
     private Database mDatabase;
     private NewsReader mNewsReader;
 
@@ -49,7 +57,7 @@ public class MainActivity extends AppCompatActivity implements OnNewsFeedItemCli
         mNewsReader=new NewsReader();
         mNewsReader.addListener(this);
 
-        mNewsReader.getNewsFeed();
+       DisplayYoutubeVideoList();
     }
 
     @Override
@@ -165,5 +173,26 @@ public class MainActivity extends AppCompatActivity implements OnNewsFeedItemCli
         fragment.setArguments(args);
 
         fragmentManager.beginTransaction().replace(R.id.mainPlaceholder,fragment,ArticleDetailsFragment.FRAGMENT_KEY).addToBackStack(null).commit();
+    }
+
+    public void DisplayYoutubeVideoList(){
+         YouTubeInitializationResult mResult= YouTubeApiServiceUtil.isYouTubeApiServiceAvailable(this);
+        if(mResult==YouTubeInitializationResult.SUCCESS)
+            {
+                YouTubeNewsFragment fragment = new YouTubeNewsFragment();
+                FragmentManager manager = getSupportFragmentManager();
+                manager.beginTransaction().replace(R.id.mainPlaceholder, fragment).addToBackStack(null).commit();
+            }
+            else
+            Toast.makeText(this,"Yotutube app is not installed",Toast.LENGTH_LONG).show();
+    }
+
+
+    @Override
+    public void onYouTubeItemClicked(YoutubeVideo video) {
+        Intent intent=new Intent(this,YouTubePlayerFragmentActivity.class);
+
+        intent.putExtra("video",video);
+        startActivity(intent);
     }
 }

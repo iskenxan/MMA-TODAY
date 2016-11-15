@@ -35,6 +35,7 @@ public class NewsfeedFragment extends Fragment {
         mRecyclerView.setLayoutManager(layoutManager);
 
         NewsFeedAdapter adapter=new NewsFeedAdapter(mArticles,(OnNewsFeedItemClicked)getActivity());
+
         mRecyclerView.setAdapter(adapter);
 
         return view;
