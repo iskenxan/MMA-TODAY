@@ -10,17 +10,14 @@ import android.view.ViewGroup;
 
 import samatov.space.mmatoday.R;
 
-public class NewViewPagerFragment  extends Fragment{
+public class NewsViewPagerFragment extends Fragment{
 
+    private ViewPager mViewPager;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view =inflater.inflate(R.layout.fragment_news_view_pager,container,false);
-        ViewPager viewPager= (ViewPager) view.findViewById(R.id.news_view_pager);
-
-
-
-
+        mViewPager= (ViewPager) view.findViewById(R.id.news_view_pager);
 
         return view;
     }

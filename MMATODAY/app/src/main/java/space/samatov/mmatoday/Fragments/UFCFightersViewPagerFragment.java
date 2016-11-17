@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import samatov.space.mmatoday.R;
 import space.samatov.mmatoday.model.Fighter;
 
-public class UFCFightersListFragment extends Fragment{
+public class UFCFightersViewPagerFragment extends Fragment{
     public ArrayList<Fighter> mFighters;
     public static final String FRAGMENT_KEY="viewpager_fragment";
     public static final String ARGS_KEY="fighters";
