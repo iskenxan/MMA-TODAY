@@ -14,6 +14,7 @@ public class AllTimeRanksFragment extends List_Fragment {
 
 
     public static final String FRAGMENT_KEY="all_time_ranks_fragment";
+    public static final String ARGS_KEY="fighters";
 
     @Override
     public void setupList() {

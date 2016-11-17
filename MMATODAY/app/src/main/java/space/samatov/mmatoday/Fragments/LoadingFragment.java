@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import samatov.space.mmatoday.R;
 
 public class LoadingFragment extends Fragment {
-
+    public static final String ARGS_KEY="";
     public static final String FRAGMENT_KEY="loading_fragment";
     @Nullable
     @Override

@@ -1,14 +1,13 @@
 package space.samatov.mmatoday.Fragments;
 
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.widget.Toast;
 
 import com.google.android.youtube.player.YouTubeInitializationResult;
 import com.google.android.youtube.player.YouTubePlayer;
 import com.google.android.youtube.player.YouTubePlayerSupportFragment;
 
-import space.samatov.mmatoday.model.Config;
+import space.samatov.mmatoday.model.YoutubeVideoReader;
 import space.samatov.mmatoday.model.YoutubeVideo;
 
 public class YoutubeFragment extends YouTubePlayerSupportFragment implements YouTubePlayer.OnInitializedListener {
@@ -34,12 +33,12 @@ public class YoutubeFragment extends YouTubePlayerSupportFragment implements You
             mVideo = bundle.getParcelable("video");
         else if(args!=null&&args.containsKey("video"))
             mVideo=args.getParcelable("video");
-        initialize(Config.YOUTUBE_API_KEY,this);
+        initialize(YoutubeVideoReader.YOUTUBE_API_KEY,this);
     }
 
     public void setmVideo(YoutubeVideo video){
         mVideo=video;
-        initialize(Config.YOUTUBE_API_KEY,this);
+        initialize(YoutubeVideoReader.YOUTUBE_API_KEY,this);
     }
 
     @Override

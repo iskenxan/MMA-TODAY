@@ -13,6 +13,8 @@ import com.bumptech.glide.Glide;
 
 import org.w3c.dom.Text;
 
+import java.util.ArrayList;
+
 import samatov.space.mmatoday.R;
 import space.samatov.mmatoday.model.Database;
 import space.samatov.mmatoday.model.Fighter;
@@ -20,6 +22,7 @@ import space.samatov.mmatoday.model.FighterStats;
 
 public class FighterDetailsFragment extends Fragment implements Database.StatsDataListener {
     public static final String FRAGMENT_KEY="fighters_details_fragment";
+    public static final String ARGS_KEY="fighter_details";
     private Fighter mFighter;
     private FighterStats mFighterStats;
     private View mView;
@@ -76,7 +79,8 @@ public class FighterDetailsFragment extends Fragment implements Database.StatsDa
 
 
         mFighterStats=new FighterStats();
-        mFighter=args.getParcelable("fighter");
+        ArrayList<Fighter> currentFighter=args.getParcelableArrayList(FighterDetailsFragment.ARGS_KEY);
+        mFighter=currentFighter.get(0);
 
 
         Database database=new Database();

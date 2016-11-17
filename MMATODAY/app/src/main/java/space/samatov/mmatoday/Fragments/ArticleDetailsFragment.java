@@ -13,6 +13,8 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
+import java.util.ArrayList;
+
 import samatov.space.mmatoday.R;
 import space.samatov.mmatoday.model.Article;
 
@@ -20,6 +22,7 @@ public class ArticleDetailsFragment  extends Fragment{
 
 
     public static final String FRAGMENT_KEY="article_details_fragment";
+    public static final String ARGS_KEY="article_details";
     private Article mArticle;
     private ImageView mImageView;
     private TextView mAuthorTextView;
@@ -31,7 +34,8 @@ public class ArticleDetailsFragment  extends Fragment{
 
         View view=inflater.inflate(R.layout.fragment_article_details,container,false);
         Bundle args=getArguments();
-        mArticle=args.getParcelable("article");
+        ArrayList<Article> argument=args.getParcelableArrayList(ARGS_KEY);
+        mArticle=argument.get(0);
         mImageView= (ImageView) view.findViewById(R.id.articleImageView);
         mAuthorTextView= (TextView) view.findViewById(R.id.articleAuthorTextView);
         mTittleTextView= (TextView) view.findViewById(R.id.articleTittleTextView);

@@ -5,12 +5,14 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.youtube.player.YouTubeApiServiceUtil;
@@ -24,40 +26,39 @@ import space.samatov.mmatoday.Fragments.ArticleDetailsFragment;
 import space.samatov.mmatoday.Fragments.FighterDetailsFragment;
 import space.samatov.mmatoday.Fragments.LoadingFragment;
 import space.samatov.mmatoday.Fragments.NewsfeedFragment;
-import space.samatov.mmatoday.Fragments.ViewPagerFragment;
+import space.samatov.mmatoday.Fragments.UFCFightersListFragment;
 import space.samatov.mmatoday.Fragments.YouTubeNewsFragment;
+import space.samatov.mmatoday.model.Article;
 import space.samatov.mmatoday.model.Database;
 import space.samatov.mmatoday.model.Fighter;
 import space.samatov.mmatoday.model.NewsReader;
 import space.samatov.mmatoday.model.OnListItemClicked;
 import space.samatov.mmatoday.model.OnNewsFeedItemClicked;
 import space.samatov.mmatoday.model.OnYouTubeThumbnailClicked;
+import space.samatov.mmatoday.model.OnYoutubeVideoListLoaded;
 import space.samatov.mmatoday.model.YoutubeVideo;
+import space.samatov.mmatoday.model.YoutubeVideoReader;
 
-public class MainActivity extends AppCompatActivity implements OnYouTubeThumbnailClicked, OnNewsFeedItemClicked,
+public class MainActivity extends AppCompatActivity implements OnYoutubeVideoListLoaded, OnYouTubeThumbnailClicked, OnNewsFeedItemClicked,
         Database.DataListener, OnListItemClicked, Database.AllTimeDataListener,NewsReader.NewsFeedListener {
-    private Database mDatabase;
-    private NewsReader mNewsReader;
-
+    private Database mDatabase=new Database();
+    private NewsReader mNewsReader=new NewsReader();
+    private Toolbar mToolbar;
+    private YoutubeVideoReader mVideoReader=new YoutubeVideoReader();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        LoadingFragment loadingFragment = new LoadingFragment();
         setContentView(R.layout.activity_main);
-
-        fragmentManager.beginTransaction().add(R.id.mainPlaceholder, loadingFragment, LoadingFragment.FRAGMENT_KEY).commit();
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        mDatabase = new Database();
+        LoadingFragment loadingFragment=new LoadingFragment();
+        startFragment(loadingFragment,null,LoadingFragment.ARGS_KEY,LoadingFragment.FRAGMENT_KEY);
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
+        mToolbar.setVisibility(View.INVISIBLE);
         mDatabase.addListener(this);
         mDatabase.addAllTimeRankListener(this);
-
-        mNewsReader=new NewsReader();
         mNewsReader.addListener(this);
-
-       DisplayYoutubeVideoList();
+        mVideoReader.addListener(this);
+        mDatabase.getFightersData();
     }
 
     @Override
@@ -73,28 +74,34 @@ public class MainActivity extends AppCompatActivity implements OnYouTubeThumbnai
         int itemId = item.getItemId();
         switch (itemId) {
             case R.id.ufcFightersListItem: {
-                if (isConnected())
-                    startViewPagerFragment();
+                if (isConnected()) {
+                   startUFCListFragment();
+                }
                 else
                     DisplayErrorMessage();
                 return true;
+            }
+            case R.id.allTimeRanksItem: {
+                if (isConnected())
+                   startAllTimeRankFragment();
+                else
+                    DisplayErrorMessage();
+                return true;
+        }
+            case R.id.newsItem:{
+                if(isConnected())
+                    mVideoReader.readYouTubeChannel();
+                else
+                    DisplayErrorMessage();
             }
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-    public void startViewPagerFragment() {
-
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        ViewPagerFragment savedFragmentInstance = (ViewPagerFragment) fragmentManager.findFragmentByTag(ViewPagerFragment.FRAGMENT_KEY);
-        if (savedFragmentInstance == null) {
-            ViewPagerFragment viewPagerFragment = new ViewPagerFragment();
-            Bundle bundle = new Bundle();
-            bundle.putParcelableArrayList("fighters", mDatabase.mUFCfighters);
-            viewPagerFragment.setArguments(bundle);
-            fragmentManager.beginTransaction().replace(R.id.mainPlaceholder, viewPagerFragment, ViewPagerFragment.FRAGMENT_KEY).commit();
-        }
+    public void startUFCListFragment() {
+        UFCFightersListFragment UFCFightersListFragment = new UFCFightersListFragment();
+        startFragment(UFCFightersListFragment,mDatabase.mUFCfighters,UFCFightersListFragment.ARGS_KEY,UFCFightersListFragment.FRAGMENT_KEY);
     }
 
 
@@ -127,52 +134,48 @@ public class MainActivity extends AppCompatActivity implements OnYouTubeThumbnai
 
     @Override
     public void OnListItemSelected(Fighter fighter) {
-        FighterDetailsFragment fragment = new FighterDetailsFragment();
-        FragmentManager fragmentManager = getSupportFragmentManager();
+        startFighterDetailsFragment(fighter);
+    }
 
-        Bundle args = new Bundle();
-        args.putParcelable("fighter", fighter);
-        fragment.setArguments(args);
-        fragmentManager.beginTransaction().replace(R.id.mainPlaceholder, fragment, FighterDetailsFragment.FRAGMENT_KEY)
-                .addToBackStack(null).commit();
+    public void startFighterDetailsFragment(Fighter fighter){
+        FighterDetailsFragment fragment = new FighterDetailsFragment();
+        ArrayList<Fighter> currentfighter=new ArrayList<>();
+        currentfighter.add(fighter);
+        startFragment(fragment,currentfighter,FighterDetailsFragment.ARGS_KEY,FighterDetailsFragment.FRAGMENT_KEY);
     }
 
 
     @Override
-    public void OnAllTimeDataReceived() {
-     startAllTimeRankFragment();
+    public void OnAllTimeDataReceived(){
+        mNewsReader.getNewsFeed();
     }
 
     public void startAllTimeRankFragment(){
         AllTimeRanksFragment fragment=new AllTimeRanksFragment();
-
-        FragmentManager fragmentManager=getSupportFragmentManager();
-        Bundle args=new Bundle();
-        args.putParcelableArrayList("fighters",mDatabase.mAllTimeFighters);
-
-        fragment.setArguments(args);
-        fragmentManager.beginTransaction().replace(R.id.mainPlaceholder,fragment,AllTimeRanksFragment.FRAGMENT_KEY).commit();
+        startFragment(fragment,mDatabase.mAllTimeFighters,AllTimeRanksFragment.ARGS_KEY,AllTimeRanksFragment.FRAGMENT_KEY);
     }
 
     @Override
     public void OnNewsFeedReceived() {
-        FragmentManager fragmentManager=getSupportFragmentManager();
+        startNewsFeedFragment();
+    }
+
+    public void startNewsFeedFragment(){
         NewsfeedFragment newsfeedFragment=new NewsfeedFragment();
-        Bundle args=new Bundle();
-        args.putParcelableArrayList("news_feed",mNewsReader.mNewsFeed);
-        newsfeedFragment.setArguments(args);
-        fragmentManager.beginTransaction().replace(R.id.mainPlaceholder,newsfeedFragment,NewsfeedFragment.FRAGMENT_KEY).commit();
+        startFragment(newsfeedFragment,mNewsReader.mNewsFeed,NewsfeedFragment.ARGS_KEY,NewsfeedFragment.FRAGMENT_KEY);
     }
 
     @Override
     public void OnNewsFeedItemClicked(int position) {
-        FragmentManager fragmentManager=getSupportFragmentManager();
-        ArticleDetailsFragment fragment=new ArticleDetailsFragment();
-        Bundle args=new Bundle();
-        args.putParcelable("article",mNewsReader.mNewsFeed.get(position));
-        fragment.setArguments(args);
+        startArticleDetailsFragment(position);
+    }
 
-        fragmentManager.beginTransaction().replace(R.id.mainPlaceholder,fragment,ArticleDetailsFragment.FRAGMENT_KEY).addToBackStack(null).commit();
+    public void startArticleDetailsFragment(int position){
+        ArticleDetailsFragment fragment=new ArticleDetailsFragment();
+        Article article=mNewsReader.mNewsFeed.get(position);
+        ArrayList<Article> articleArrayList=new ArrayList<>();
+        articleArrayList.add(article);
+        startFragment(fragment,articleArrayList,ArticleDetailsFragment.ARGS_KEY,ArticleDetailsFragment.FRAGMENT_KEY);
     }
 
     public void DisplayYoutubeVideoList(){
@@ -180,8 +183,7 @@ public class MainActivity extends AppCompatActivity implements OnYouTubeThumbnai
         if(mResult==YouTubeInitializationResult.SUCCESS)
             {
                 YouTubeNewsFragment fragment = new YouTubeNewsFragment();
-                FragmentManager manager = getSupportFragmentManager();
-                manager.beginTransaction().replace(R.id.mainPlaceholder, fragment).addToBackStack(null).commit();
+              startFragment(fragment,mVideoReader.mVideos,YouTubeNewsFragment.ARGS_KEY,YouTubeNewsFragment.FRAGMENT_KEY);
             }
             else
             Toast.makeText(this,"Yotutube app is not installed",Toast.LENGTH_LONG).show();
@@ -194,5 +196,26 @@ public class MainActivity extends AppCompatActivity implements OnYouTubeThumbnai
 
         intent.putExtra("video",video);
         startActivity(intent);
+    }
+
+    @Override
+    public void OnVideosLoaded() {
+        DisplayYoutubeVideoList();
+    }
+
+
+
+    public void startFragment(Fragment fragment, ArrayList args,String args_key, String fragment_key){
+        if(!(fragment instanceof LoadingFragment))
+            mToolbar.setVisibility(View.VISIBLE);
+
+        FragmentManager fragmentManager=getSupportFragmentManager();
+        Fragment savedInstance=fragmentManager.findFragmentByTag(fragment_key);
+        if(savedInstance==null) {
+            Bundle bundle = new Bundle();
+            bundle.putParcelableArrayList(args_key, args);
+            fragment.setArguments(bundle);
+            fragmentManager.beginTransaction().replace(R.id.mainPlaceholder,fragment, fragment_key).addToBackStack(null).commit();
+        }
     }
 }

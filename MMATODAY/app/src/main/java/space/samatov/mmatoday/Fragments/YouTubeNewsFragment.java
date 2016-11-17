@@ -21,36 +21,28 @@ import space.samatov.mmatoday.model.YoutubeVideo;
 
 public class YouTubeNewsFragment  extends Fragment
 {
+    public static final String FRAGMENT_KEY="youtube_list_fragment";
+    public static final String ARGS_KEY="youtube_list";
+
 
     private RecyclerView mRecyclerView;
     private ArrayList<YoutubeVideo> mVideos;
-
-    public YouTubeNewsFragment() {
-
-    }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view= inflater.inflate(R.layout.fragment_youtube_news,container,false);
 
-            mRecyclerView= (RecyclerView) view.findViewById(R.id.youtubeRecyclerView);
-            mVideos=new ArrayList<>();
-            YoutubeVideo youtubeVideo1=new YoutubeVideo();
-            youtubeVideo1.setmId("DsdDKCdOt2w");
-            youtubeVideo1.setmTitle("I want to fight with Dana's Son Conor McGregor,Tyron Woodley vs Stephen Thompson Rematch will happen");
-            YoutubeVideo youtubeVideo2=new YoutubeVideo();
-            youtubeVideo2.setmId("3bQ4YjCf4b0");
-            youtubeVideo2.setmTitle("Conor McGregor makes his Big Announcement,Dana on Khabib vs Conor,Eddie-I Fought Foolishly");
+        Bundle  args=getArguments();
+        mVideos=args.getParcelableArrayList("videos");
+        YoutubeVideo video1=new YoutubeVideo();
 
-            mVideos.add(youtubeVideo1);
-            mVideos.add(youtubeVideo2);
+        mRecyclerView= (RecyclerView) view.findViewById(R.id.youtubeRecyclerView);
+        YoutubeListAdapter adapter=new YoutubeListAdapter(mVideos);
 
-            YoutubeListAdapter adapter=new YoutubeListAdapter(mVideos);
-
-            mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         adapter.addListeners((OnYouTubeThumbnailClicked) getActivity());
-            mRecyclerView.setAdapter(adapter);
+        mRecyclerView.setAdapter(adapter);
         return view;
     }
 

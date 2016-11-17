@@ -15,7 +15,7 @@ import com.google.android.youtube.player.YouTubeThumbnailView;
 import java.util.ArrayList;
 
 import samatov.space.mmatoday.R;
-import space.samatov.mmatoday.model.Config;
+import space.samatov.mmatoday.model.YoutubeVideoReader;
 import space.samatov.mmatoday.model.OnYouTubeThumbnailClicked;
 import space.samatov.mmatoday.model.YoutubeVideo;
 
@@ -65,7 +65,7 @@ public class YoutubeListAdapter extends RecyclerView.Adapter {
 
         public void bindView(int position){
             mCurrentPosition=position;
-            mThumb.initialize(Config.YOUTUBE_API_KEY,this);
+            mThumb.initialize(YoutubeVideoReader.YOUTUBE_API_KEY,this);
             mTitle.setText(mVideoList.get(position).getmTitle());
         }
 

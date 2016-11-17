@@ -9,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Spinner;
 
 import java.util.ArrayList;
 
@@ -20,7 +21,7 @@ import space.samatov.mmatoday.model.OnNewsFeedItemClicked;
 public class NewsfeedFragment extends Fragment {
 
     public static final String FRAGMENT_KEY="news_feed_fragment";
-
+    public static final String ARGS_KEY="news_feed_list";
 
     ArrayList<Article> mArticles;
     RecyclerView mRecyclerView;
@@ -28,7 +29,9 @@ public class NewsfeedFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view=inflater.inflate(R.layout.fragment_list,container,false);
-        mArticles=getArguments().getParcelableArrayList("news_feed");
+        mArticles=getArguments().getParcelableArrayList(ARGS_KEY);
+        Spinner spinner= (Spinner) view.findViewById(R.id.weightClassSpinner);
+        spinner.setVisibility(View.INVISIBLE);
         mRecyclerView= (RecyclerView) view.findViewById(R.id.listRecyclerView);
 
         RecyclerView.LayoutManager layoutManager=new LinearLayoutManager(getActivity());
