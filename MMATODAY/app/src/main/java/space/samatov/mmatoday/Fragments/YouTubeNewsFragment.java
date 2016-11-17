@@ -34,7 +34,7 @@ public class YouTubeNewsFragment  extends Fragment
         View view= inflater.inflate(R.layout.fragment_youtube_news,container,false);
 
         Bundle  args=getArguments();
-        mVideos=args.getParcelableArrayList("videos");
+        mVideos=args.getParcelableArrayList(ARGS_KEY);
         YoutubeVideo video1=new YoutubeVideo();
 
         mRecyclerView= (RecyclerView) view.findViewById(R.id.youtubeRecyclerView);

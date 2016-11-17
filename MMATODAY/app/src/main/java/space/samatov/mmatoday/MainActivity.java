@@ -26,7 +26,7 @@ import space.samatov.mmatoday.Fragments.ArticleDetailsFragment;
 import space.samatov.mmatoday.Fragments.FighterDetailsFragment;
 import space.samatov.mmatoday.Fragments.LoadingFragment;
 import space.samatov.mmatoday.Fragments.NewsfeedFragment;
-import space.samatov.mmatoday.Fragments.UFCFightersListFragment;
+import space.samatov.mmatoday.Fragments.UFCFightersViewPagerFragment;
 import space.samatov.mmatoday.Fragments.YouTubeNewsFragment;
 import space.samatov.mmatoday.model.Article;
 import space.samatov.mmatoday.model.Database;
@@ -45,6 +45,7 @@ public class MainActivity extends AppCompatActivity implements OnYoutubeVideoLis
     private NewsReader mNewsReader=new NewsReader();
     private Toolbar mToolbar;
     private YoutubeVideoReader mVideoReader=new YoutubeVideoReader();
+    private int mCurrentMenuChoice;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,7 +59,8 @@ public class MainActivity extends AppCompatActivity implements OnYoutubeVideoLis
         mDatabase.addAllTimeRankListener(this);
         mNewsReader.addListener(this);
         mVideoReader.addListener(this);
-        mDatabase.getFightersData();
+
+       mNewsReader.getNewsFeed();
     }
 
     @Override
@@ -74,23 +76,39 @@ public class MainActivity extends AppCompatActivity implements OnYoutubeVideoLis
         int itemId = item.getItemId();
         switch (itemId) {
             case R.id.ufcFightersListItem: {
+                mCurrentMenuChoice=R.id.ufcFightersListItem;
                 if (isConnected()) {
+                    if(mDatabase.mUFCfighters!=null&&mDatabase.mUFCfighters.size()>0)
                    startUFCListFragment();
+                    else
+                        mDatabase.getFightersData();
                 }
                 else
                     DisplayErrorMessage();
                 return true;
             }
             case R.id.allTimeRanksItem: {
-                if (isConnected())
-                   startAllTimeRankFragment();
+                mCurrentMenuChoice=R.id.allTimeRanksItem;
+                if (isConnected()) {
+                    if(mDatabase.mAllTimeFighters!=null&&mDatabase.mAllTimeFighters.size()>0)
+                        startAllTimeRankFragment();
+                    else if(mDatabase.mUFCfighters!=null&&mDatabase.mUFCfighters.size()>0)
+                        mDatabase.readAllTimeRanks();
+                    else
+                        mDatabase.getFightersData();
+                }
                 else
                     DisplayErrorMessage();
                 return true;
         }
             case R.id.newsItem:{
-                if(isConnected())
+                if(isConnected()){
+                    mCurrentMenuChoice=R.id.newsItem;
+                    if(mVideoReader.mVideos.size()<=0)
                     mVideoReader.readYouTubeChannel();
+                    else
+                        DisplayYoutubeVideoList();
+                }
                 else
                     DisplayErrorMessage();
             }
@@ -100,8 +118,8 @@ public class MainActivity extends AppCompatActivity implements OnYoutubeVideoLis
     }
 
     public void startUFCListFragment() {
-        UFCFightersListFragment UFCFightersListFragment = new UFCFightersListFragment();
-        startFragment(UFCFightersListFragment,mDatabase.mUFCfighters,UFCFightersListFragment.ARGS_KEY,UFCFightersListFragment.FRAGMENT_KEY);
+        UFCFightersViewPagerFragment UFCFightersViewPagerFragment = new UFCFightersViewPagerFragment();
+        startFragment(UFCFightersViewPagerFragment,mDatabase.mUFCfighters, UFCFightersViewPagerFragment.ARGS_KEY, UFCFightersViewPagerFragment.FRAGMENT_KEY);
     }
 
 
@@ -124,6 +142,9 @@ public class MainActivity extends AppCompatActivity implements OnYoutubeVideoLis
 
     @Override
     public void onDataReceived() {
+        if(mCurrentMenuChoice==R.id.ufcFightersListItem)
+        startUFCListFragment();
+        else if(mCurrentMenuChoice==R.id.allTimeRanksItem)
         mDatabase.readAllTimeRanks();
     }
 
@@ -147,7 +168,7 @@ public class MainActivity extends AppCompatActivity implements OnYoutubeVideoLis
 
     @Override
     public void OnAllTimeDataReceived(){
-        mNewsReader.getNewsFeed();
+       startAllTimeRankFragment();
     }
 
     public void startAllTimeRankFragment(){
@@ -164,6 +185,7 @@ public class MainActivity extends AppCompatActivity implements OnYoutubeVideoLis
         NewsfeedFragment newsfeedFragment=new NewsfeedFragment();
         startFragment(newsfeedFragment,mNewsReader.mNewsFeed,NewsfeedFragment.ARGS_KEY,NewsfeedFragment.FRAGMENT_KEY);
     }
+
 
     @Override
     public void OnNewsFeedItemClicked(int position) {
@@ -200,7 +222,13 @@ public class MainActivity extends AppCompatActivity implements OnYoutubeVideoLis
 
     @Override
     public void OnVideosLoaded() {
-        DisplayYoutubeVideoList();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                DisplayYoutubeVideoList();
+            }
+        });
+
     }
 
 
@@ -217,5 +245,7 @@ public class MainActivity extends AppCompatActivity implements OnYoutubeVideoLis
             fragment.setArguments(bundle);
             fragmentManager.beginTransaction().replace(R.id.mainPlaceholder,fragment, fragment_key).addToBackStack(null).commit();
         }
+        else
+            fragmentManager.beginTransaction().replace(R.id.mainPlaceholder,savedInstance,fragment_key).addToBackStack(null).commit();
     }
 }
