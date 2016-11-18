@@ -9,7 +9,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Spinner;
 
 import java.util.ArrayList;
 
@@ -28,11 +27,9 @@ public class NewsfeedFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view=inflater.inflate(R.layout.fragment_list,container,false);
+        View view=inflater.inflate(R.layout.fragment_recycler_view_only,container,false);
         mArticles=getArguments().getParcelableArrayList(ARGS_KEY);
-        Spinner spinner= (Spinner) view.findViewById(R.id.weightClassSpinner);
-        spinner.setVisibility(View.INVISIBLE);
-        mRecyclerView= (RecyclerView) view.findViewById(R.id.listRecyclerView);
+        mRecyclerView= (RecyclerView) view.findViewById(R.id.recyclerViewOnly);
 
         RecyclerView.LayoutManager layoutManager=new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(layoutManager);

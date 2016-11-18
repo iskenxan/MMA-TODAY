@@ -10,7 +10,12 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
+
+import com.google.android.youtube.player.YouTubeApiServiceUtil;
+import com.google.android.youtube.player.YouTubeInitializationResult;
 
 import java.util.ArrayList;
 
@@ -27,22 +32,32 @@ public class YouTubeNewsFragment  extends Fragment
 
     private RecyclerView mRecyclerView;
     private ArrayList<YoutubeVideo> mVideos;
-
+    private LinearLayout mLinearLayout;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view= inflater.inflate(R.layout.fragment_youtube_news,container,false);
+        mLinearLayout= (LinearLayout) view.findViewById(R.id.youtubeNewsLinearView);
+        final YouTubeInitializationResult result = YouTubeApiServiceUtil.isYouTubeApiServiceAvailable(getActivity());
 
-        Bundle  args=getArguments();
-        mVideos=args.getParcelableArrayList(ARGS_KEY);
-        YoutubeVideo video1=new YoutubeVideo();
+        if (result == YouTubeInitializationResult.SUCCESS) {
+            //If there are any issues we can show an error dialog.
+            Bundle  args=getArguments();
+            mVideos=args.getParcelableArrayList(ARGS_KEY);
 
-        mRecyclerView= (RecyclerView) view.findViewById(R.id.youtubeRecyclerView);
-        YoutubeListAdapter adapter=new YoutubeListAdapter(mVideos);
+            mRecyclerView= (RecyclerView) view.findViewById(R.id.youtubeRecyclerView);
+            YoutubeListAdapter adapter=new YoutubeListAdapter(mVideos);
 
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter.addListeners((OnYouTubeThumbnailClicked) getActivity());
-        mRecyclerView.setAdapter(adapter);
+            mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+            adapter.addListeners((OnYouTubeThumbnailClicked) getActivity());
+            mRecyclerView.setAdapter(adapter);
+        }
+        else {
+            TextView textView = new TextView(getContext());
+            textView.setText("You need to install youtube");
+            textView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+            mLinearLayout.addView(textView);
+        }
         return view;
     }
 

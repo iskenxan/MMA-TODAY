@@ -15,9 +15,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import com.google.android.youtube.player.YouTubeApiServiceUtil;
-import com.google.android.youtube.player.YouTubeInitializationResult;
-
 import java.util.ArrayList;
 
 import samatov.space.mmatoday.R;
@@ -25,42 +22,48 @@ import space.samatov.mmatoday.Fragments.AllTimeRanksFragment;
 import space.samatov.mmatoday.Fragments.ArticleDetailsFragment;
 import space.samatov.mmatoday.Fragments.FighterDetailsFragment;
 import space.samatov.mmatoday.Fragments.LoadingFragment;
+import space.samatov.mmatoday.Fragments.NewsViewPagerFragment;
 import space.samatov.mmatoday.Fragments.NewsfeedFragment;
 import space.samatov.mmatoday.Fragments.UFCFightersViewPagerFragment;
 import space.samatov.mmatoday.Fragments.YouTubeNewsFragment;
 import space.samatov.mmatoday.model.Article;
-import space.samatov.mmatoday.model.Database;
+import space.samatov.mmatoday.model.FighterReader;
 import space.samatov.mmatoday.model.Fighter;
 import space.samatov.mmatoday.model.NewsReader;
+import space.samatov.mmatoday.model.OctagonGirlsReader;
 import space.samatov.mmatoday.model.OnListItemClicked;
 import space.samatov.mmatoday.model.OnNewsFeedItemClicked;
+import space.samatov.mmatoday.model.OnOctagonGirlsDataReceived;
 import space.samatov.mmatoday.model.OnYouTubeThumbnailClicked;
 import space.samatov.mmatoday.model.OnYoutubeVideoListLoaded;
 import space.samatov.mmatoday.model.YoutubeVideo;
 import space.samatov.mmatoday.model.YoutubeVideoReader;
 
-public class MainActivity extends AppCompatActivity implements OnYoutubeVideoListLoaded, OnYouTubeThumbnailClicked, OnNewsFeedItemClicked,
-        Database.DataListener, OnListItemClicked, Database.AllTimeDataListener,NewsReader.NewsFeedListener {
-    private Database mDatabase=new Database();
+public class MainActivity extends AppCompatActivity implements OnOctagonGirlsDataReceived, OnYoutubeVideoListLoaded, OnYouTubeThumbnailClicked, OnNewsFeedItemClicked,
+        FighterReader.DataListener, OnListItemClicked, FighterReader.AllTimeDataListener,NewsReader.NewsFeedListener {
+    private FighterReader mFighterReader =new FighterReader();
     private NewsReader mNewsReader=new NewsReader();
     private Toolbar mToolbar;
     private YoutubeVideoReader mVideoReader=new YoutubeVideoReader();
-    private int mCurrentMenuChoice;
+    private OctagonGirlsReader mOctagonGirlsReader=new OctagonGirlsReader();
+
+    private int mCurrentMenuChoice=0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         LoadingFragment loadingFragment=new LoadingFragment();
-        startFragment(loadingFragment,null,LoadingFragment.ARGS_KEY,LoadingFragment.FRAGMENT_KEY);
+        startFragment(loadingFragment,null,null,null,LoadingFragment.ARGS_KEY,LoadingFragment.FRAGMENT_KEY);
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
         mToolbar.setVisibility(View.INVISIBLE);
-        mDatabase.addListener(this);
-        mDatabase.addAllTimeRankListener(this);
+        mFighterReader.addListener(this);
+        mFighterReader.addAllTimeRankListener(this);
         mNewsReader.addListener(this);
         mVideoReader.addListener(this);
-
-       mNewsReader.getNewsFeed();
+        mOctagonGirlsReader.addListener(this);
+        mOctagonGirlsReader.getOctagonGirls();
+        //mNewsReader.getNewsFeed();
     }
 
     @Override
@@ -78,10 +81,10 @@ public class MainActivity extends AppCompatActivity implements OnYoutubeVideoLis
             case R.id.ufcFightersListItem: {
                 mCurrentMenuChoice=R.id.ufcFightersListItem;
                 if (isConnected()) {
-                    if(mDatabase.mUFCfighters!=null&&mDatabase.mUFCfighters.size()>0)
+                    if(mFighterReader.mUFCfighters!=null&& mFighterReader.mUFCfighters.size()>0)
                    startUFCListFragment();
                     else
-                        mDatabase.getFightersData();
+                        mFighterReader.getFightersData();
                 }
                 else
                     DisplayErrorMessage();
@@ -90,12 +93,12 @@ public class MainActivity extends AppCompatActivity implements OnYoutubeVideoLis
             case R.id.allTimeRanksItem: {
                 mCurrentMenuChoice=R.id.allTimeRanksItem;
                 if (isConnected()) {
-                    if(mDatabase.mAllTimeFighters!=null&&mDatabase.mAllTimeFighters.size()>0)
+                    if(mFighterReader.mAllTimeFighters!=null&& mFighterReader.mAllTimeFighters.size()>0)
                         startAllTimeRankFragment();
-                    else if(mDatabase.mUFCfighters!=null&&mDatabase.mUFCfighters.size()>0)
-                        mDatabase.readAllTimeRanks();
+                    else if(mFighterReader.mUFCfighters!=null&& mFighterReader.mUFCfighters.size()>0)
+                        mFighterReader.readAllTimeRanks();
                     else
-                        mDatabase.getFightersData();
+                        mFighterReader.getFightersData();
                 }
                 else
                     DisplayErrorMessage();
@@ -104,10 +107,10 @@ public class MainActivity extends AppCompatActivity implements OnYoutubeVideoLis
             case R.id.newsItem:{
                 if(isConnected()){
                     mCurrentMenuChoice=R.id.newsItem;
-                    if(mVideoReader.mVideos.size()<=0)
-                    mVideoReader.readYouTubeChannel();
-                    else
-                        DisplayYoutubeVideoList();
+                    if((mNewsReader.mNewsFeed!=null&&mNewsReader.mNewsFeed.size()>0)&&(mVideoReader.mVideos!=null&&mVideoReader.mVideos.size()>0))
+                        startNewsFragment();
+                    if(mNewsReader.mNewsFeed==null||mNewsReader.mNewsFeed.size()<=0)
+                        mNewsReader.getNewsFeed();
                 }
                 else
                     DisplayErrorMessage();
@@ -119,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements OnYoutubeVideoLis
 
     public void startUFCListFragment() {
         UFCFightersViewPagerFragment UFCFightersViewPagerFragment = new UFCFightersViewPagerFragment();
-        startFragment(UFCFightersViewPagerFragment,mDatabase.mUFCfighters, UFCFightersViewPagerFragment.ARGS_KEY, UFCFightersViewPagerFragment.FRAGMENT_KEY);
+        startFragment(UFCFightersViewPagerFragment, mFighterReader.mUFCfighters,null,UFCFightersViewPagerFragment.ARGS_KEY,null, UFCFightersViewPagerFragment.FRAGMENT_KEY);
     }
 
 
@@ -140,12 +143,17 @@ public class MainActivity extends AppCompatActivity implements OnYoutubeVideoLis
         });
     }
 
+    private void startNewsFragment(){
+        NewsViewPagerFragment fragment=new NewsViewPagerFragment();
+        startFragment(fragment,mNewsReader.mNewsFeed,mVideoReader.mVideos,NewsfeedFragment.ARGS_KEY,YouTubeNewsFragment.ARGS_KEY,NewsfeedFragment.FRAGMENT_KEY);
+    }
+
     @Override
     public void onDataReceived() {
         if(mCurrentMenuChoice==R.id.ufcFightersListItem)
         startUFCListFragment();
         else if(mCurrentMenuChoice==R.id.allTimeRanksItem)
-        mDatabase.readAllTimeRanks();
+        mFighterReader.readAllTimeRanks();
     }
 
     @Override
@@ -162,7 +170,7 @@ public class MainActivity extends AppCompatActivity implements OnYoutubeVideoLis
         FighterDetailsFragment fragment = new FighterDetailsFragment();
         ArrayList<Fighter> currentfighter=new ArrayList<>();
         currentfighter.add(fighter);
-        startFragment(fragment,currentfighter,FighterDetailsFragment.ARGS_KEY,FighterDetailsFragment.FRAGMENT_KEY);
+        startFragment(fragment,currentfighter,null,FighterDetailsFragment.ARGS_KEY,null,FighterDetailsFragment.FRAGMENT_KEY);
     }
 
 
@@ -173,17 +181,12 @@ public class MainActivity extends AppCompatActivity implements OnYoutubeVideoLis
 
     public void startAllTimeRankFragment(){
         AllTimeRanksFragment fragment=new AllTimeRanksFragment();
-        startFragment(fragment,mDatabase.mAllTimeFighters,AllTimeRanksFragment.ARGS_KEY,AllTimeRanksFragment.FRAGMENT_KEY);
+        startFragment(fragment, mFighterReader.mAllTimeFighters,null,AllTimeRanksFragment.ARGS_KEY,null,AllTimeRanksFragment.FRAGMENT_KEY);
     }
 
     @Override
-    public void OnNewsFeedReceived() {
-        startNewsFeedFragment();
-    }
-
-    public void startNewsFeedFragment(){
-        NewsfeedFragment newsfeedFragment=new NewsfeedFragment();
-        startFragment(newsfeedFragment,mNewsReader.mNewsFeed,NewsfeedFragment.ARGS_KEY,NewsfeedFragment.FRAGMENT_KEY);
+    public void OnNewsFeedReceived(){
+        mVideoReader.readYouTubeChannel();
     }
 
 
@@ -197,20 +200,8 @@ public class MainActivity extends AppCompatActivity implements OnYoutubeVideoLis
         Article article=mNewsReader.mNewsFeed.get(position);
         ArrayList<Article> articleArrayList=new ArrayList<>();
         articleArrayList.add(article);
-        startFragment(fragment,articleArrayList,ArticleDetailsFragment.ARGS_KEY,ArticleDetailsFragment.FRAGMENT_KEY);
+        startFragment(fragment,articleArrayList,null,ArticleDetailsFragment.ARGS_KEY,null,ArticleDetailsFragment.FRAGMENT_KEY);
     }
-
-    public void DisplayYoutubeVideoList(){
-         YouTubeInitializationResult mResult= YouTubeApiServiceUtil.isYouTubeApiServiceAvailable(this);
-        if(mResult==YouTubeInitializationResult.SUCCESS)
-            {
-                YouTubeNewsFragment fragment = new YouTubeNewsFragment();
-              startFragment(fragment,mVideoReader.mVideos,YouTubeNewsFragment.ARGS_KEY,YouTubeNewsFragment.FRAGMENT_KEY);
-            }
-            else
-            Toast.makeText(this,"Yotutube app is not installed",Toast.LENGTH_LONG).show();
-    }
-
 
     @Override
     public void onYouTubeItemClicked(YoutubeVideo video) {
@@ -225,7 +216,7 @@ public class MainActivity extends AppCompatActivity implements OnYoutubeVideoLis
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                DisplayYoutubeVideoList();
+                startNewsFragment();
             }
         });
 
@@ -233,19 +224,31 @@ public class MainActivity extends AppCompatActivity implements OnYoutubeVideoLis
 
 
 
-    public void startFragment(Fragment fragment, ArrayList args,String args_key, String fragment_key){
+    public void startFragment(Fragment fragment, ArrayList args,ArrayList args2,String args_key,String args2_key, String fragment_key){
         if(!(fragment instanceof LoadingFragment))
             mToolbar.setVisibility(View.VISIBLE);
-
         FragmentManager fragmentManager=getSupportFragmentManager();
         Fragment savedInstance=fragmentManager.findFragmentByTag(fragment_key);
         if(savedInstance==null) {
             Bundle bundle = new Bundle();
             bundle.putParcelableArrayList(args_key, args);
+            if(args2!=null)
+            {
+                bundle.putParcelableArrayList(args2_key,args2);
+            }
             fragment.setArguments(bundle);
             fragmentManager.beginTransaction().replace(R.id.mainPlaceholder,fragment, fragment_key).addToBackStack(null).commit();
         }
         else
             fragmentManager.beginTransaction().replace(R.id.mainPlaceholder,savedInstance,fragment_key).addToBackStack(null).commit();
+    }
+
+    @Override
+    public void OnOctagonGirlsDataReceived() {
+
+    }
+
+    private void startOctagonGirlsListFragment(){
+
     }
 }
