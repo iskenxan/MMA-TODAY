@@ -21,25 +21,29 @@ import samatov.space.mmatoday.R;
 import space.samatov.mmatoday.Fragments.AllTimeRanksFragment;
 import space.samatov.mmatoday.Fragments.ArticleDetailsFragment;
 import space.samatov.mmatoday.Fragments.FighterDetailsFragment;
+import space.samatov.mmatoday.Fragments.FragmentDetailsOctagonGirl;
 import space.samatov.mmatoday.Fragments.LoadingFragment;
 import space.samatov.mmatoday.Fragments.NewsViewPagerFragment;
 import space.samatov.mmatoday.Fragments.NewsfeedFragment;
+import space.samatov.mmatoday.Fragments.OctagonGirlsRecyclerViewFragment;
 import space.samatov.mmatoday.Fragments.UFCFightersViewPagerFragment;
 import space.samatov.mmatoday.Fragments.YouTubeNewsFragment;
 import space.samatov.mmatoday.model.Article;
 import space.samatov.mmatoday.model.FighterReader;
 import space.samatov.mmatoday.model.Fighter;
 import space.samatov.mmatoday.model.NewsReader;
+import space.samatov.mmatoday.model.OctagonGirl;
 import space.samatov.mmatoday.model.OctagonGirlsReader;
 import space.samatov.mmatoday.model.OnListItemClicked;
 import space.samatov.mmatoday.model.OnNewsFeedItemClicked;
+import space.samatov.mmatoday.model.OnOctagonGirlItemClicked;
 import space.samatov.mmatoday.model.OnOctagonGirlsDataReceived;
 import space.samatov.mmatoday.model.OnYouTubeThumbnailClicked;
 import space.samatov.mmatoday.model.OnYoutubeVideoListLoaded;
 import space.samatov.mmatoday.model.YoutubeVideo;
 import space.samatov.mmatoday.model.YoutubeVideoReader;
 
-public class MainActivity extends AppCompatActivity implements OnOctagonGirlsDataReceived, OnYoutubeVideoListLoaded, OnYouTubeThumbnailClicked, OnNewsFeedItemClicked,
+public class MainActivity extends AppCompatActivity implements OnOctagonGirlItemClicked, OnOctagonGirlsDataReceived, OnYoutubeVideoListLoaded, OnYouTubeThumbnailClicked, OnNewsFeedItemClicked,
         FighterReader.DataListener, OnListItemClicked, FighterReader.AllTimeDataListener,NewsReader.NewsFeedListener {
     private FighterReader mFighterReader =new FighterReader();
     private NewsReader mNewsReader=new NewsReader();
@@ -62,8 +66,7 @@ public class MainActivity extends AppCompatActivity implements OnOctagonGirlsDat
         mNewsReader.addListener(this);
         mVideoReader.addListener(this);
         mOctagonGirlsReader.addListener(this);
-        mOctagonGirlsReader.getOctagonGirls();
-        //mNewsReader.getNewsFeed();
+        mNewsReader.getNewsFeed();
     }
 
     @Override
@@ -114,6 +117,16 @@ public class MainActivity extends AppCompatActivity implements OnOctagonGirlsDat
                 }
                 else
                     DisplayErrorMessage();
+            }
+
+            case R.id.octagonGirlsItem:{
+                if(isConnected()){
+                    mCurrentMenuChoice=R.id.octagonGirlsItem;
+                    if((mOctagonGirlsReader.mOctagonGirls!=null)&&(mOctagonGirlsReader.mOctagonGirls.size()>0))
+                        startOctagonGirlsRecyclerViewFragment();
+                    else
+                        mOctagonGirlsReader.getOctagonGirls();
+                }
             }
             default:
                 return super.onOptionsItemSelected(item);
@@ -223,6 +236,24 @@ public class MainActivity extends AppCompatActivity implements OnOctagonGirlsDat
     }
 
 
+    @Override
+    public void OnOctagonGirlsDataReceived() {
+        startOctagonGirlsRecyclerViewFragment();
+    }
+
+    private void startOctagonGirlsRecyclerViewFragment(){
+        OctagonGirlsRecyclerViewFragment fragment=new OctagonGirlsRecyclerViewFragment();
+        startFragment(fragment,mOctagonGirlsReader.mOctagonGirls,null,OctagonGirlsRecyclerViewFragment.ARGS_KEY,null,OctagonGirlsRecyclerViewFragment.FRAGMENT_KEY);
+    }
+
+
+    @Override
+    public void OnItemClickedOctagonGirl(int position) {
+        FragmentDetailsOctagonGirl fragment=new FragmentDetailsOctagonGirl();
+        ArrayList<OctagonGirl> argumentList=new ArrayList<>();
+        argumentList.add(mOctagonGirlsReader.mOctagonGirls.get(position));
+        startFragment(fragment,argumentList,null,FragmentDetailsOctagonGirl.ARGS_KEY,null,FragmentDetailsOctagonGirl.FRAGMENT_KEY);
+    }
 
     public void startFragment(Fragment fragment, ArrayList args,ArrayList args2,String args_key,String args2_key, String fragment_key){
         if(!(fragment instanceof LoadingFragment))
@@ -243,12 +274,6 @@ public class MainActivity extends AppCompatActivity implements OnOctagonGirlsDat
             fragmentManager.beginTransaction().replace(R.id.mainPlaceholder,savedInstance,fragment_key).addToBackStack(null).commit();
     }
 
-    @Override
-    public void OnOctagonGirlsDataReceived() {
 
-    }
 
-    private void startOctagonGirlsListFragment(){
-
-    }
 }

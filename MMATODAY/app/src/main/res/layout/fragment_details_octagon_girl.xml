@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:src="@drawable/octagon_girl_full_body"
+        android:id="@+id/BackgroundImageViewOctagonGirlDetails"/>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/octagon_girl_recyclerview_banner_bg"
+        android:alpha="0.6"/>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/white"
+            tools:text="Andryanny Celeste"
+            android:gravity="left"
+            android:layout_marginTop="30dp"
+            android:textSize="30sp"
+            android:textStyle="bold"
+            android:id="@+id/NameTextViewOctagonGirlsDetails"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_marginTop="70dp"
+            android:layout_height="wrap_content"
+            android:text="Biography"
+            android:textColor="@android:color/white"
+            android:textSize="20sp"/>
+
+        <TextView
+            android:layout_marginTop="20dp"
+            android:textColor="@android:color/white"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="15sp"
+            tools:text="'The best part of the job is the whole experience, being able to travel and watch these great fighters'- she said. 'Plus, all of this is real, so its just amazing.'The perks of the job aren't bad either.Sometimes I get recognized and it's really cool when you see people who just want to talk to you and get your picture,' she admits.'It makes me feel really good, like a little celebrity (Laughs)'"
+            android:id="@+id/Bio1TextViewOctagonGirlDetails" />
+
+        <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="15sp"
+        android:layout_marginTop="20dp"
+        android:textColor="@android:color/white"
+            android:id="@+id/Bio2TextViewOctagonGirlDetails"
+        tools:text="Arianny Celeste became a UFC Octagon Girl in typical fashion ; through a modeling casting call - but ever since she made her debut at the Hard Rock Hotel and Casino in 2006, life has been anything but typical for Celeste, who saw her first live mixed martial arts fight that summer night in Las Vegas.It was nerve racking and kinda scary, but it was really cool, said Arianny of her first night working for the UFC.I liked it a lot.Since then, this striking Latina has become a fixture at UFC events and a fan favorite.s also transformed from a casual fan of MMA to a diehard follower of the sport."/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_marginTop="40dp"
+            android:layout_height="wrap_content"
+            android:text="About"
+            android:textColor="@android:color/white"
+            android:textSize="20sp"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="20dp">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="From:"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                android:textSize="15sp"/>
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="3"
+                android:layout_height="wrap_content"
+                tools:text="Las Vegas,USA"
+                android:id="@+id/FromTextViewOctagonGirlsDetails"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                android:textSize="15sp"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="20dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Born:"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="3"
+                android:layout_height="wrap_content"
+                tools:text="1984-11-12"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                android:id="@+id/BornTextViewOctagonGirlsDetails"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="20dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Height:"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                android:id="@+id/textView2" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="3"
+                android:layout_height="wrap_content"
+                tools:text="65"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                android:id="@+id/HeightTextViewOctagonGirlsDetails"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="20dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Weight:"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="3"
+                android:layout_height="wrap_content"
+                tools:text="65"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                android:id="@+id/WeightTextViewOctagonGirlsDetails"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="20dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Hobbies:"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="3"
+                android:layout_height="wrap_content"
+                tools:text="Singing, Dancing, Pilates, Kickboxing, Muay Thai"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                android:id="@+id/HobbiesTextViewOctagonGirlsDetails"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="20dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Favorite Food:"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="3"
+                android:layout_height="wrap_content"
+                tools:text="Singing, Dancing, Pilates, Kickboxing, Muay Thai"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                android:id="@+id/FavoriteFoodTextViewOctagonGirlsDetails"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="20dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Twitter:"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="3"
+                android:layout_height="wrap_content"
+                tools:text="\@AriannyCeleste"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                android:id="@+id/TwitterUsernameTextViewOctagonGirlsDetails"/>
+        </LinearLayout>
+
+    </LinearLayout>
+    </ScrollView>
+</RelativeLayout>

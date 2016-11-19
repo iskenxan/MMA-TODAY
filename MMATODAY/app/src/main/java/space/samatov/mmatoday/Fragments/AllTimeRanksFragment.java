@@ -6,7 +6,7 @@ import android.support.v7.widget.RecyclerView;
 import android.widget.ArrayAdapter;
 
 import samatov.space.mmatoday.R;
-import space.samatov.mmatoday.Adapters.RecyclerViewAdapter;
+import space.samatov.mmatoday.Adapters.FightersRecyclerViewAdapter;
 import space.samatov.mmatoday.model.OnListItemClicked;
 import space.samatov.mmatoday.model.Sorter;
 
@@ -38,7 +38,7 @@ public class AllTimeRanksFragment extends List_Fragment {
         RecyclerView.LayoutManager layoutManager=new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(layoutManager);
 
-        RecyclerViewAdapter adapter=new RecyclerViewAdapter(mCurrentFighters,(OnListItemClicked)getActivity(),false);
+        FightersRecyclerViewAdapter adapter=new FightersRecyclerViewAdapter(mCurrentFighters,(OnListItemClicked)getActivity(),false);
         mListeners.add(adapter);
         mRecyclerView.setAdapter(adapter);
     }

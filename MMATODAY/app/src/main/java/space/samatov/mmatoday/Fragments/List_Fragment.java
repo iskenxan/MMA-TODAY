@@ -3,7 +3,6 @@ package space.samatov.mmatoday.Fragments;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,10 +13,8 @@ import android.widget.Spinner;
 
 import java.util.ArrayList;
 import samatov.space.mmatoday.R;
-import space.samatov.mmatoday.Adapters.RecyclerViewAdapter;
 import space.samatov.mmatoday.model.Fighter;
 import space.samatov.mmatoday.model.ListItem;
-import space.samatov.mmatoday.model.OnListItemClicked;
 
 
 public abstract class List_Fragment extends android.support.v4.app.Fragment implements AdapterView.OnItemSelectedListener {

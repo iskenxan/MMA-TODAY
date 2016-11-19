@@ -3,11 +3,10 @@ package space.samatov.mmatoday.Fragments;
 
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.View;
 import android.widget.ArrayAdapter;
 
 import samatov.space.mmatoday.R;
-import space.samatov.mmatoday.Adapters.RecyclerViewAdapter;
+import space.samatov.mmatoday.Adapters.FightersRecyclerViewAdapter;
 import space.samatov.mmatoday.model.OnListItemClicked;
 import space.samatov.mmatoday.model.Sorter;
 
@@ -42,7 +41,7 @@ public class WomenListFragment extends List_Fragment {
         RecyclerView.LayoutManager layoutManager=new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(layoutManager);
 
-        RecyclerViewAdapter adapter=new RecyclerViewAdapter(mCurrentFighters,(OnListItemClicked)getActivity(),true);
+        FightersRecyclerViewAdapter adapter=new FightersRecyclerViewAdapter(mCurrentFighters,(OnListItemClicked)getActivity(),true);
         mListeners.add(adapter);
         mRecyclerView.setAdapter(adapter);
     }

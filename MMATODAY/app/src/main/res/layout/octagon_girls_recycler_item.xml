@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scaleType="fitCenter"
+        android:adjustViewBounds="true"
+        tools:src="@drawable/octagon_girl"
+        android:id="@+id/octagonGirlRecyclerImageView"/>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/octagon_girl_recyclerview_banner_bg"
+        android:layout_alignTop="@+id/octagonGirlRecyclerImageView"
+        android:layout_alignBottom="@id/octagonGirlRecyclerImageView"
+        android:alpha="0.4"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        tools:text="Arianny Celeste"
+        android:textColor="@android:color/white"
+        android:paddingLeft="30dp"
+        android:textSize="25dp"
+        android:textStyle="bold"
+        android:id="@+id/octagonGirlRecyclerTextView"/>
+</RelativeLayout>

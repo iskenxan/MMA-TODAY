@@ -41,7 +41,6 @@ public class YouTubeNewsFragment  extends Fragment
         final YouTubeInitializationResult result = YouTubeApiServiceUtil.isYouTubeApiServiceAvailable(getActivity());
 
         if (result == YouTubeInitializationResult.SUCCESS) {
-            //If there are any issues we can show an error dialog.
             Bundle  args=getArguments();
             mVideos=args.getParcelableArrayList(ARGS_KEY);
 

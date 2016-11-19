@@ -73,7 +73,7 @@ public class OctagonGirl implements Parcelable {
     }
 
     public void setmBio1(String mBio1) {
-        this.mBio1 = mBio1;
+        this.mBio1=formatBioData(mBio1);
     }
 
     public String getmBio2() {
@@ -81,7 +81,7 @@ public class OctagonGirl implements Parcelable {
     }
 
     public void setmBio2(String mBio2) {
-        this.mBio2 = mBio2;
+        this.mBio2 = formatBioData(mBio2);
     }
 
     public String getmFavoriteFood() {
@@ -154,6 +154,18 @@ public class OctagonGirl implements Parcelable {
 
     public void setmBanner(String mBanner) {
         this.mBanner = mBanner;
+    }
+
+
+    private String formatBioData(String bio){
+        String str=bio;
+        str=str.replaceAll("&nbsp;","");
+        str=str.replaceAll("&ldquo;","");
+        str=str.replaceAll("&rdquo;","");
+        str=str.replaceAll("&ndash;","");
+        str=str.replaceAll("\\<.*?\\> ?","");
+
+        return str;
     }
 
     @Override
