@@ -13,7 +13,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -22,10 +21,10 @@ import space.samatov.mmatoday.Fragments.AllTimeRanksFragment;
 import space.samatov.mmatoday.Fragments.ArticleDetailsFragment;
 import space.samatov.mmatoday.Fragments.FighterDetailsFragment;
 import space.samatov.mmatoday.Fragments.FragmentDetailsOctagonGirl;
-import space.samatov.mmatoday.Fragments.FragmentLeanBackGallery;
 import space.samatov.mmatoday.Fragments.LoadingFragment;
 import space.samatov.mmatoday.Fragments.NewsViewPagerFragment;
 import space.samatov.mmatoday.Fragments.NewsfeedFragment;
+import space.samatov.mmatoday.Fragments.NoConnectionDialogFragment;
 import space.samatov.mmatoday.Fragments.OctagonGirlsRecyclerViewFragment;
 import space.samatov.mmatoday.Fragments.UFCFightersViewPagerFragment;
 import space.samatov.mmatoday.Fragments.YouTubeNewsFragment;
@@ -35,8 +34,6 @@ import space.samatov.mmatoday.model.Fighter;
 import space.samatov.mmatoday.model.NewsReader;
 import space.samatov.mmatoday.model.OctagonGirl;
 import space.samatov.mmatoday.model.OctagonGirlsReader;
-import space.samatov.mmatoday.model.OnGalleryButtonClicked;
-import space.samatov.mmatoday.model.OnLeanBackClicked;
 import space.samatov.mmatoday.model.OnListItemClicked;
 import space.samatov.mmatoday.model.OnNewsFeedItemClicked;
 import space.samatov.mmatoday.model.OnOctagonGirlItemClicked;
@@ -46,7 +43,7 @@ import space.samatov.mmatoday.model.OnYoutubeVideoListLoaded;
 import space.samatov.mmatoday.model.YoutubeVideo;
 import space.samatov.mmatoday.model.YoutubeVideoReader;
 
-public class MainActivity extends AppCompatActivity implements OnGalleryButtonClicked, OnLeanBackClicked, OnOctagonGirlItemClicked, OnOctagonGirlsDataReceived, OnYoutubeVideoListLoaded, OnYouTubeThumbnailClicked, OnNewsFeedItemClicked,
+public class MainActivity extends AppCompatActivity implements  OnOctagonGirlItemClicked, OnOctagonGirlsDataReceived, OnYoutubeVideoListLoaded, OnYouTubeThumbnailClicked, OnNewsFeedItemClicked,
         FighterReader.DataListener, OnListItemClicked, FighterReader.AllTimeDataListener,NewsReader.NewsFeedListener {
     private FighterReader mFighterReader =new FighterReader();
     private NewsReader mNewsReader=new NewsReader();
@@ -59,17 +56,23 @@ public class MainActivity extends AppCompatActivity implements OnGalleryButtonCl
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        LoadingFragment loadingFragment=new LoadingFragment();
-        startFragment(loadingFragment,null,null,null,LoadingFragment.ARGS_KEY,LoadingFragment.FRAGMENT_KEY);
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
-        mToolbar.setVisibility(View.INVISIBLE);
+        startLoadingFragment();
+
+        subscribeToEvents();
+        if(mNewsReader.mNewsFeed==null||mNewsReader.mNewsFeed.size()<=0)
+        mNewsReader.getNewsFeed();
+        else
+            startNewsFragment();
+    }
+
+    public void subscribeToEvents(){
         mFighterReader.addListener(this);
         mFighterReader.addAllTimeRankListener(this);
         mNewsReader.addListener(this);
         mVideoReader.addListener(this);
         mOctagonGirlsReader.addListener(this);
-        mNewsReader.getNewsFeed();
     }
 
     @Override
@@ -80,12 +83,13 @@ public class MainActivity extends AppCompatActivity implements OnGalleryButtonCl
         return true;
     }
 
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemId = item.getItemId();
         switch (itemId) {
-            case R.id.ufcFightersListItem: {
-                mCurrentMenuChoice=R.id.ufcFightersListItem;
+            case R.id.ufcFightersMenuItem: {
+                mCurrentMenuChoice=R.id.ufcFightersMenuItem;
                 if (isConnected()) {
                     if(mFighterReader.mUFCfighters!=null&& mFighterReader.mUFCfighters.size()>0)
                    startUFCListFragment();
@@ -93,11 +97,11 @@ public class MainActivity extends AppCompatActivity implements OnGalleryButtonCl
                         mFighterReader.getFightersData();
                 }
                 else
-                    DisplayErrorMessage();
+                    showNoConnectionMessage();
                 return true;
             }
-            case R.id.allTimeRanksItem: {
-                mCurrentMenuChoice=R.id.allTimeRanksItem;
+            case R.id.allTimeRanksMenuItem: {
+                mCurrentMenuChoice=R.id.allTimeRanksMenuItem;
                 if (isConnected()) {
                     if(mFighterReader.mAllTimeFighters!=null&& mFighterReader.mAllTimeFighters.size()>0)
                         startAllTimeRankFragment();
@@ -107,24 +111,24 @@ public class MainActivity extends AppCompatActivity implements OnGalleryButtonCl
                         mFighterReader.getFightersData();
                 }
                 else
-                    DisplayErrorMessage();
+                    showNoConnectionMessage();
                 return true;
         }
-            case R.id.newsItem:{
+            case R.id.newsMenuItem:{
                 if(isConnected()){
-                    mCurrentMenuChoice=R.id.newsItem;
+                    mCurrentMenuChoice=R.id.newsMenuItem;
                     if((mNewsReader.mNewsFeed!=null&&mNewsReader.mNewsFeed.size()>0)&&(mVideoReader.mVideos!=null&&mVideoReader.mVideos.size()>0))
                         startNewsFragment();
                     if(mNewsReader.mNewsFeed==null||mNewsReader.mNewsFeed.size()<=0)
                         mNewsReader.getNewsFeed();
                 }
                 else
-                    DisplayErrorMessage();
+                    showNoConnectionMessage();
             }
 
-            case R.id.octagonGirlsItem:{
+            case R.id.octagonGirlsMenuItem:{
                 if(isConnected()){
-                    mCurrentMenuChoice=R.id.octagonGirlsItem;
+                    mCurrentMenuChoice=R.id.octagonGirlsMenuItem;
                     if((mOctagonGirlsReader.mOctagonGirls!=null)&&(mOctagonGirlsReader.mOctagonGirls.size()>0))
                         startOctagonGirlsRecyclerViewFragment();
                     else
@@ -136,50 +140,33 @@ public class MainActivity extends AppCompatActivity implements OnGalleryButtonCl
         }
     }
 
+    public boolean isConnected() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        if(activeNetworkInfo==null)
+            showNoConnectionMessage();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
+    private void showNoConnectionMessage() {
+        NoConnectionDialogFragment fragment =new NoConnectionDialogFragment();
+        fragment.show(getSupportFragmentManager(),NoConnectionDialogFragment.FRAGMENT_KEY);
+    }
+
+    public void startLoadingFragment(){
+        LoadingFragment loadingFragment=new LoadingFragment();
+        startFragment(loadingFragment,null,null,null,LoadingFragment.ARGS_KEY,LoadingFragment.FRAGMENT_KEY);
+    }
+
     public void startUFCListFragment() {
         UFCFightersViewPagerFragment UFCFightersViewPagerFragment = new UFCFightersViewPagerFragment();
         startFragment(UFCFightersViewPagerFragment, mFighterReader.mUFCfighters,null,UFCFightersViewPagerFragment.ARGS_KEY,null, UFCFightersViewPagerFragment.FRAGMENT_KEY);
     }
 
-
-    public boolean isConnected() {
-        ConnectivityManager connectivityManager
-                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
-    }
-
-
-    private void DisplayErrorMessage() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(MainActivity.this, "Error retrieving data from the server", Toast.LENGTH_LONG).show();
-            }
-        });
-    }
-
     private void startNewsFragment(){
         NewsViewPagerFragment fragment=new NewsViewPagerFragment();
         startFragment(fragment,mNewsReader.mNewsFeed,mVideoReader.mVideos,NewsfeedFragment.ARGS_KEY,YouTubeNewsFragment.ARGS_KEY,NewsfeedFragment.FRAGMENT_KEY);
-    }
-
-    @Override
-    public void onDataReceived() {
-        if(mCurrentMenuChoice==R.id.ufcFightersListItem)
-        startUFCListFragment();
-        else if(mCurrentMenuChoice==R.id.allTimeRanksItem)
-        mFighterReader.readAllTimeRanks();
-    }
-
-    @Override
-    public void onDataFailed() {
-        DisplayErrorMessage();
-    }
-
-    @Override
-    public void OnListItemSelected(Fighter fighter) {
-        startFighterDetailsFragment(fighter);
     }
 
     public void startFighterDetailsFragment(Fighter fighter){
@@ -189,6 +176,43 @@ public class MainActivity extends AppCompatActivity implements OnGalleryButtonCl
         startFragment(fragment,currentfighter,null,FighterDetailsFragment.ARGS_KEY,null,FighterDetailsFragment.FRAGMENT_KEY);
     }
 
+    public void startArticleDetailsFragment(int position){
+        ArticleDetailsFragment fragment=new ArticleDetailsFragment();
+        Article article=mNewsReader.mNewsFeed.get(position);
+        ArrayList<Article> articleArrayList=new ArrayList<>();
+        articleArrayList.add(article);
+        startFragment(fragment,articleArrayList,null,ArticleDetailsFragment.ARGS_KEY,null,ArticleDetailsFragment.FRAGMENT_KEY);
+    }
+
+    private void startOctagonGirlsRecyclerViewFragment(){
+        OctagonGirlsRecyclerViewFragment fragment=new OctagonGirlsRecyclerViewFragment();
+        startFragment(fragment,mOctagonGirlsReader.mOctagonGirls,null,OctagonGirlsRecyclerViewFragment.ARGS_KEY,null,OctagonGirlsRecyclerViewFragment.FRAGMENT_KEY);
+    }
+
+    public void startYouTubePlayer(YoutubeVideo video){
+        Intent intent=new Intent(this,YouTubePlayerFragmentActivity.class);
+        intent.putExtra("video",video);
+        startActivity(intent);
+    }
+
+
+    @Override
+    public void onDataReceived() {
+        if(mCurrentMenuChoice==R.id.ufcFightersMenuItem)
+        startUFCListFragment();
+        else if(mCurrentMenuChoice==R.id.allTimeRanksMenuItem)
+        mFighterReader.readAllTimeRanks();
+    }
+
+    @Override
+    public void onDataFailed() {
+        showNoConnectionMessage();
+    }
+
+    @Override
+    public void OnListItemSelected(Fighter fighter) {
+        startFighterDetailsFragment(fighter);
+    }
 
     @Override
     public void OnAllTimeDataReceived(){
@@ -211,21 +235,14 @@ public class MainActivity extends AppCompatActivity implements OnGalleryButtonCl
         startArticleDetailsFragment(position);
     }
 
-    public void startArticleDetailsFragment(int position){
-        ArticleDetailsFragment fragment=new ArticleDetailsFragment();
-        Article article=mNewsReader.mNewsFeed.get(position);
-        ArrayList<Article> articleArrayList=new ArrayList<>();
-        articleArrayList.add(article);
-        startFragment(fragment,articleArrayList,null,ArticleDetailsFragment.ARGS_KEY,null,ArticleDetailsFragment.FRAGMENT_KEY);
-    }
+
 
     @Override
     public void onYouTubeItemClicked(YoutubeVideo video) {
-        Intent intent=new Intent(this,YouTubePlayerFragmentActivity.class);
-
-        intent.putExtra("video",video);
-        startActivity(intent);
+     startYouTubePlayer(video);
     }
+
+
 
     @Override
     public void OnVideosLoaded() {
@@ -244,10 +261,7 @@ public class MainActivity extends AppCompatActivity implements OnGalleryButtonCl
         startOctagonGirlsRecyclerViewFragment();
     }
 
-    private void startOctagonGirlsRecyclerViewFragment(){
-        OctagonGirlsRecyclerViewFragment fragment=new OctagonGirlsRecyclerViewFragment();
-        startFragment(fragment,mOctagonGirlsReader.mOctagonGirls,null,OctagonGirlsRecyclerViewFragment.ARGS_KEY,null,OctagonGirlsRecyclerViewFragment.FRAGMENT_KEY);
-    }
+
 
 
     @Override
@@ -259,29 +273,15 @@ public class MainActivity extends AppCompatActivity implements OnGalleryButtonCl
     }
 
 
-
-    public void startGalleryFragment(OctagonGirl octagonGirl){
-        FragmentLeanBackGallery fragment=new FragmentLeanBackGallery();
-        startFragment(fragment,octagonGirl.getmGallery(),null,FragmentLeanBackGallery.ARGS_KEY,null,FragmentLeanBackGallery.FRAGMENT_KEY);
-    }
-
-    @Override
-    public void OnLeanBackItemClicked(String url) {
-
-    }
-
-    @Override
-    public void galleryButtonClicked(OctagonGirl octagonGirl) {
-       startGalleryFragment(octagonGirl);
-    }
-
-
     public void startFragment(Fragment fragment, ArrayList args,ArrayList args2,String args_key,String args2_key, String fragment_key){
         if(!(fragment instanceof LoadingFragment))
             mToolbar.setVisibility(View.VISIBLE);
+        else
+            mToolbar.setVisibility(View.GONE);
+
         FragmentManager fragmentManager=getSupportFragmentManager();
         Fragment savedInstance=fragmentManager.findFragmentByTag(fragment_key);
-        if(savedInstance==null) {
+       // if(savedInstance==null) {
             Bundle bundle = new Bundle();
             bundle.putParcelableArrayList(args_key, args);
             if(args2!=null)
@@ -291,7 +291,6 @@ public class MainActivity extends AppCompatActivity implements OnGalleryButtonCl
             fragment.setArguments(bundle);
             fragmentManager.beginTransaction().replace(R.id.mainPlaceholder,fragment, fragment_key).addToBackStack(null).commit();
         }
-        else
-            fragmentManager.beginTransaction().replace(R.id.mainPlaceholder,savedInstance,fragment_key).addToBackStack(null).commit();
-    }
+
+  //  }
 }

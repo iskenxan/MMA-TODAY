@@ -26,7 +26,8 @@ public class UFCFightersViewPagerFragment extends Fragment{
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view= inflater.inflate(R.layout.fragment_viewpager,container,false);
-        mFighters=getArguments().getParcelableArrayList("fighters");
+        Bundle args=getArguments();
+        mFighters=args.getParcelableArrayList("fighters");
         FragmentManager fragmentManager=getChildFragmentManager();
         menListFragment = (MenListFragment) fragmentManager.findFragmentByTag(MenListFragment.FRAGMENT_KEY);
         womenListFragment= (WomenListFragment) fragmentManager.findFragmentByTag(WomenListFragment.FRAGMENT_KEY);

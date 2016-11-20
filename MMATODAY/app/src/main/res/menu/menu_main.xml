@@ -3,23 +3,20 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.example.ashley.mmatoday.MainActivity">
     <item
-        android:id="@+id/ufcFightersListItem"
+        android:id="@+id/ufcFightersMenuItem"
         android:title="@string/action_ufc_fighters"
         app:showAsAction="never" />
     <item
-        android:id="@+id/newsItem"
+        android:id="@+id/newsMenuItem"
         android:title="@string/news"
         app:showAsAction="never" />
     <item
-        android:id="@+id/allTimeRanksItem"
+        android:id="@+id/allTimeRanksMenuItem"
         android:title="@string/all_time_ranks"
         app:showAsAction="never" />
     <item
-        android:id="@+id/octagonGirlsItem"
+        android:id="@+id/octagonGirlsMenuItem"
         android:title="@string/octagon_girls"
         app:showAsAction="never" />
-    <item
-        android:id="@+id/quizzesItem"
-        android:title="@string/quiz"
-        app:showAsAction="never" />
+
 </menu>
