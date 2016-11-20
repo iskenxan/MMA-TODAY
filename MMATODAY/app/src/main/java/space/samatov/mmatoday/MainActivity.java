@@ -22,6 +22,7 @@ import space.samatov.mmatoday.Fragments.AllTimeRanksFragment;
 import space.samatov.mmatoday.Fragments.ArticleDetailsFragment;
 import space.samatov.mmatoday.Fragments.FighterDetailsFragment;
 import space.samatov.mmatoday.Fragments.FragmentDetailsOctagonGirl;
+import space.samatov.mmatoday.Fragments.FragmentLeanBackGallery;
 import space.samatov.mmatoday.Fragments.LoadingFragment;
 import space.samatov.mmatoday.Fragments.NewsViewPagerFragment;
 import space.samatov.mmatoday.Fragments.NewsfeedFragment;
@@ -34,6 +35,8 @@ import space.samatov.mmatoday.model.Fighter;
 import space.samatov.mmatoday.model.NewsReader;
 import space.samatov.mmatoday.model.OctagonGirl;
 import space.samatov.mmatoday.model.OctagonGirlsReader;
+import space.samatov.mmatoday.model.OnGalleryButtonClicked;
+import space.samatov.mmatoday.model.OnLeanBackClicked;
 import space.samatov.mmatoday.model.OnListItemClicked;
 import space.samatov.mmatoday.model.OnNewsFeedItemClicked;
 import space.samatov.mmatoday.model.OnOctagonGirlItemClicked;
@@ -43,13 +46,13 @@ import space.samatov.mmatoday.model.OnYoutubeVideoListLoaded;
 import space.samatov.mmatoday.model.YoutubeVideo;
 import space.samatov.mmatoday.model.YoutubeVideoReader;
 
-public class MainActivity extends AppCompatActivity implements OnOctagonGirlItemClicked, OnOctagonGirlsDataReceived, OnYoutubeVideoListLoaded, OnYouTubeThumbnailClicked, OnNewsFeedItemClicked,
+public class MainActivity extends AppCompatActivity implements OnGalleryButtonClicked, OnLeanBackClicked, OnOctagonGirlItemClicked, OnOctagonGirlsDataReceived, OnYoutubeVideoListLoaded, OnYouTubeThumbnailClicked, OnNewsFeedItemClicked,
         FighterReader.DataListener, OnListItemClicked, FighterReader.AllTimeDataListener,NewsReader.NewsFeedListener {
     private FighterReader mFighterReader =new FighterReader();
     private NewsReader mNewsReader=new NewsReader();
     private Toolbar mToolbar;
     private YoutubeVideoReader mVideoReader=new YoutubeVideoReader();
-    private OctagonGirlsReader mOctagonGirlsReader=new OctagonGirlsReader();
+    private OctagonGirlsReader mOctagonGirlsReader=OctagonGirlsReader.referenceActivity(this);
 
     private int mCurrentMenuChoice=0;
     @Override
@@ -255,6 +258,24 @@ public class MainActivity extends AppCompatActivity implements OnOctagonGirlItem
         startFragment(fragment,argumentList,null,FragmentDetailsOctagonGirl.ARGS_KEY,null,FragmentDetailsOctagonGirl.FRAGMENT_KEY);
     }
 
+
+
+    public void startGalleryFragment(OctagonGirl octagonGirl){
+        FragmentLeanBackGallery fragment=new FragmentLeanBackGallery();
+        startFragment(fragment,octagonGirl.getmGallery(),null,FragmentLeanBackGallery.ARGS_KEY,null,FragmentLeanBackGallery.FRAGMENT_KEY);
+    }
+
+    @Override
+    public void OnLeanBackItemClicked(String url) {
+
+    }
+
+    @Override
+    public void galleryButtonClicked(OctagonGirl octagonGirl) {
+       startGalleryFragment(octagonGirl);
+    }
+
+
     public void startFragment(Fragment fragment, ArrayList args,ArrayList args2,String args_key,String args2_key, String fragment_key){
         if(!(fragment instanceof LoadingFragment))
             mToolbar.setVisibility(View.VISIBLE);
@@ -273,7 +294,4 @@ public class MainActivity extends AppCompatActivity implements OnOctagonGirlItem
         else
             fragmentManager.beginTransaction().replace(R.id.mainPlaceholder,savedInstance,fragment_key).addToBackStack(null).commit();
     }
-
-
-
 }

@@ -11,8 +11,7 @@ public class OctagonGirl implements Parcelable {
     private String mLast;
     private String mCountry;
     private String mCity;
-    private String mBio1;
-    private String mBio2;
+    private String mBio;
     private String mFavoriteFood;
     private String mHobbies;
     private String mBirthDate;
@@ -68,20 +67,12 @@ public class OctagonGirl implements Parcelable {
         this.mCity = mCity;
     }
 
-    public String getmBio1() {
-        return mBio1;
+    public String getmBio() {
+        return mBio;
     }
 
-    public void setmBio1(String mBio1) {
-        this.mBio1=formatBioData(mBio1);
-    }
-
-    public String getmBio2() {
-        return mBio2;
-    }
-
-    public void setmBio2(String mBio2) {
-        this.mBio2 = formatBioData(mBio2);
+    public void setmBio(String mBio) {
+        this.mBio =formatBioData(mBio);
     }
 
     public String getmFavoriteFood() {
@@ -105,7 +96,7 @@ public class OctagonGirl implements Parcelable {
     }
 
     public void setmBirthDate(String mBirthDate) {
-        this.mBirthDate = mBirthDate;
+        this.mBirthDate = mBirthDate.replaceAll("T00:00:00Z","");
     }
 
     public String getmQuote() {
@@ -179,8 +170,7 @@ public class OctagonGirl implements Parcelable {
         parcel.writeString(mLast);
         parcel.writeString(mCountry);
         parcel.writeString(mCity);
-        parcel.writeString(mBio1);
-        parcel.writeString(mBio2);
+        parcel.writeString(mBio);
         parcel.writeString(mFavoriteFood);
         parcel.writeString(mHobbies);
         parcel.writeString(mBirthDate);
@@ -209,8 +199,7 @@ public class OctagonGirl implements Parcelable {
         mLast = in.readString();
         mCountry = in.readString();
         mCity = in.readString();
-        mBio1 = in.readString();
-        mBio2 = in.readString();
+        mBio = in.readString();
         mFavoriteFood = in.readString();
         mHobbies = in.readString();
         mBirthDate = in.readString();

@@ -18,9 +18,12 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true">
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginRight="14dp"
+        android:layout_marginEnd="14dp"
+        android:layout_marginBottom="23dp">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -52,16 +55,8 @@
             android:layout_height="wrap_content"
             android:textSize="15sp"
             tools:text="'The best part of the job is the whole experience, being able to travel and watch these great fighters'- she said. 'Plus, all of this is real, so its just amazing.'The perks of the job aren't bad either.Sometimes I get recognized and it's really cool when you see people who just want to talk to you and get your picture,' she admits.'It makes me feel really good, like a little celebrity (Laughs)'"
-            android:id="@+id/Bio1TextViewOctagonGirlDetails" />
+            android:id="@+id/BioTextViewOctagonGirlDetails" />
 
-        <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="15sp"
-        android:layout_marginTop="20dp"
-        android:textColor="@android:color/white"
-            android:id="@+id/Bio2TextViewOctagonGirlDetails"
-        tools:text="Arianny Celeste became a UFC Octagon Girl in typical fashion ; through a modeling casting call - but ever since she made her debut at the Hard Rock Hotel and Casino in 2006, life has been anything but typical for Celeste, who saw her first live mixed martial arts fight that summer night in Las Vegas.It was nerve racking and kinda scary, but it was really cool, said Arianny of her first night working for the UFC.I liked it a lot.Since then, this striking Latina has become a fixture at UFC events and a fan favorite.s also transformed from a casual fan of MMA to a diehard follower of the sport."/>
 
         <TextView
             android:layout_width="match_parent"
@@ -70,29 +65,7 @@
             android:text="About"
             android:textColor="@android:color/white"
             android:textSize="20sp"/>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="20dp">
-            <TextView
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:text="From:"
-                android:textColor="@android:color/white"
-                android:textStyle="bold"
-                android:textSize="15sp"/>
-            <TextView
-                android:layout_width="0dp"
-                android:layout_weight="3"
-                android:layout_height="wrap_content"
-                tools:text="Las Vegas,USA"
-                android:id="@+id/FromTextViewOctagonGirlsDetails"
-                android:textColor="@android:color/white"
-                android:textStyle="bold"
-                android:textSize="15sp"/>
-        </LinearLayout>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -107,7 +80,7 @@
                 android:textColor="@android:color/white"
                 android:textStyle="bold"
                 android:textSize="15sp"
-                />
+                android:id="@+id/textView4" />
 
             <TextView
                 android:layout_width="0dp"
@@ -175,7 +148,35 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="20dp">
+            android:layout_marginTop="20dp"
+            android:id="@+id/FromLinearLayoutOctagonGirlsDetails">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="From:"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                android:id="@+id/textView" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="3"
+                android:layout_height="wrap_content"
+                tools:text="Las Vegas,USA"
+                android:id="@+id/FromTextViewOctagonGirlsDetails"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                android:textSize="15sp"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="20dp"
+            android:id="@+id/HobbiesLinearLayoutOctagonGirlsDetails">
 
             <TextView
                 android:layout_width="0dp"
@@ -197,11 +198,13 @@
                 android:textSize="15sp"
                 android:id="@+id/HobbiesTextViewOctagonGirlsDetails"/>
         </LinearLayout>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="20dp">
+            android:layout_marginTop="20dp"
+            android:id="@+id/FavoriteFoodLinearLayoutOctagonGirlsDetails">
 
             <TextView
                 android:layout_width="0dp"
@@ -227,7 +230,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="20dp">
+            android:layout_marginTop="20dp"
+            android:id="@+id/TwitterUserNameLinearLayoutOctagonGirlsDetails">
 
             <TextView
                 android:layout_width="0dp"
@@ -249,7 +253,12 @@
                 android:textSize="15sp"
                 android:id="@+id/TwitterUsernameTextViewOctagonGirlsDetails"/>
         </LinearLayout>
-
+        <Button
+            android:layout_marginTop="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="View Gallery"
+            android:id="@+id/GalleryButtonOctagonGirlsDetails"/>
     </LinearLayout>
     </ScrollView>
 </RelativeLayout>
