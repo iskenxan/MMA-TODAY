@@ -10,15 +10,18 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 import samatov.space.mmatoday.R;
+import space.samatov.mmatoday.model.interfaces.OctagonGirlsDataReceived;
 
 public class OctagonGirlsReader extends JsonReader {
+    public static final String OCT_GIRLS_KEY="octagon_girls";
+
     public static final String mOctagonGirlsUrl="http://ufc-data-api.ufc.com/api/v3/iphone/octagon_girls";
 
     public ArrayList<OctagonGirl> mOctagonGirls=new ArrayList<>();
     private Activity mActivity;
-    public ArrayList<OnOctagonGirlsDataReceived> mListeners=new ArrayList<>();
+    private ArrayList<OctagonGirlsDataReceived> mListeners=new ArrayList<>();
 
-    public void addListener(OnOctagonGirlsDataReceived listener){
+    public void addListener(OctagonGirlsDataReceived listener){
         mListeners.add(listener);
     }
     private OctagonGirlsReader(Activity activity){
@@ -73,13 +76,13 @@ public class OctagonGirlsReader extends JsonReader {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        NotifyListeners(true);
+        notifyListeners(true);
     }
 
     @Override
-    protected void NotifyListeners(boolean sucess) {
+    protected void notifyListeners(boolean sucess) {
         if(sucess) {
-            for (OnOctagonGirlsDataReceived listener : mListeners)
+            for (OctagonGirlsDataReceived listener : mListeners)
                 listener.OnOctagonGirlsDataReceived();
         }
     }

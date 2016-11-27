@@ -1,7 +1,6 @@
 package space.samatov.mmatoday.model;
 
 import android.util.Log;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -15,18 +14,23 @@ import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import space.samatov.mmatoday.model.interfaces.YoutubeVideoListLoaded;
 
 public class YoutubeVideoReader {
+
+    public static final String YOUTUBE_VIDEOS_KEY="youtube_videos";
+
+
     public static final String YOUTUBE_API_KEY="AIzaSyD2-vaKQT7vPwXri55JjIoZCDN8avStNjA";
-    public static final String MMA_WORLD_CHANNEL_ID="UClkruV5L-hsu20MDYOa1hvw";
-    public static final String MMA_WORLD_UPLOADS_ID="UUlkruV5L-hsu20MDYOa1hvw";
-    private static String mMMAUploadsListRequest="https://www.googleapis.com/youtube/v3/playlistItems?part=contentDetails%2Csnippet&playlistId=UUlkruV5L-hsu20MDYOa1hvw&key=AIzaSyD2-vaKQT7vPwXri55JjIoZCDN8avStNjA";
+    private static final String MMA_WORLD_UPLOADS_ID="UUlkruV5L-hsu20MDYOa1hvw";
+
+    private static String mMMAUploadsListRequest="https://www.googleapis.com/youtube/v3/playlistItems?part=contentDetails%2Csnippet&playlistId="+MMA_WORLD_UPLOADS_ID+"&key=AIzaSyD2-vaKQT7vPwXri55JjIoZCDN8avStNjA";
 
 
     public ArrayList<YoutubeVideo> mVideos=new ArrayList<>();
-    private ArrayList<OnYoutubeVideoListLoaded> mListeners=new ArrayList<>();
+    private ArrayList<YoutubeVideoListLoaded> mListeners=new ArrayList<>();
 
-    public void addListener(OnYoutubeVideoListLoaded listener){
+    public void addListener(YoutubeVideoListLoaded listener){
         mListeners.add(listener);
 
     }
@@ -96,7 +100,7 @@ public class YoutubeVideoReader {
     }
 
     private void notifyListeners(){
-        for (OnYoutubeVideoListLoaded listener:mListeners)
+        for (YoutubeVideoListLoaded listener:mListeners)
             listener.OnVideosLoaded();
     }
 

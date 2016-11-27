@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import samatov.space.mmatoday.R;
 import space.samatov.mmatoday.Adapters.AdapterOctagonGirlsRecycler;
 import space.samatov.mmatoday.model.OctagonGirl;
-import space.samatov.mmatoday.model.OnOctagonGirlItemClicked;
+import space.samatov.mmatoday.model.interfaces.OctagonGirlItemClicked;
 
 public class OctagonGirlsRecyclerViewFragment extends Fragment {
 
@@ -27,11 +27,11 @@ public class OctagonGirlsRecyclerViewFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view =inflater.inflate(R.layout.fragment_recycler_view_only,container,false);
+        View view =inflater.inflate(R.layout.fragment_recycler,container,false);
         mRecyclerView= (RecyclerView) view.findViewById(R.id.recyclerViewOnly);
         mOctagonGirls=getArguments().getParcelableArrayList(ARGS_KEY);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        AdapterOctagonGirlsRecycler adapter=new AdapterOctagonGirlsRecycler(mOctagonGirls,((OnOctagonGirlItemClicked) getActivity()));
+        AdapterOctagonGirlsRecycler adapter=new AdapterOctagonGirlsRecycler(mOctagonGirls,((OctagonGirlItemClicked) getActivity()));
 
         mRecyclerView.setAdapter(adapter);
 

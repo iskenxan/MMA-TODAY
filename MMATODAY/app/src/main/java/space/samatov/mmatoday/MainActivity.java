@@ -2,6 +2,7 @@ package space.samatov.mmatoday;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -9,12 +10,15 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.FrameLayout;
+import android.widget.TextView;
+
+import com.yalantis.guillotine.animation.GuillotineAnimation;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import samatov.space.mmatoday.R;
 import space.samatov.mmatoday.Fragments.AllTimeRanksFragment;
@@ -22,52 +26,151 @@ import space.samatov.mmatoday.Fragments.ArticleDetailsFragment;
 import space.samatov.mmatoday.Fragments.FighterDetailsFragment;
 import space.samatov.mmatoday.Fragments.FragmentDetailsOctagonGirl;
 import space.samatov.mmatoday.Fragments.LoadingFragment;
-import space.samatov.mmatoday.Fragments.NewsViewPagerFragment;
-import space.samatov.mmatoday.Fragments.NewsfeedFragment;
+import space.samatov.mmatoday.Fragments.NewsFragment;
+import space.samatov.mmatoday.Fragments.ArticlesFragment;
 import space.samatov.mmatoday.Fragments.NoConnectionDialogFragment;
 import space.samatov.mmatoday.Fragments.OctagonGirlsRecyclerViewFragment;
-import space.samatov.mmatoday.Fragments.UFCFightersViewPagerFragment;
+import space.samatov.mmatoday.Fragments.UFCFightersFragment;
 import space.samatov.mmatoday.Fragments.YouTubeNewsFragment;
 import space.samatov.mmatoday.model.Article;
 import space.samatov.mmatoday.model.FighterReader;
 import space.samatov.mmatoday.model.Fighter;
+import space.samatov.mmatoday.model.interfaces.NewsFeedReceived;
 import space.samatov.mmatoday.model.NewsReader;
 import space.samatov.mmatoday.model.OctagonGirl;
 import space.samatov.mmatoday.model.OctagonGirlsReader;
-import space.samatov.mmatoday.model.OnListItemClicked;
-import space.samatov.mmatoday.model.OnNewsFeedItemClicked;
-import space.samatov.mmatoday.model.OnOctagonGirlItemClicked;
-import space.samatov.mmatoday.model.OnOctagonGirlsDataReceived;
-import space.samatov.mmatoday.model.OnYouTubeThumbnailClicked;
-import space.samatov.mmatoday.model.OnYoutubeVideoListLoaded;
+import space.samatov.mmatoday.model.interfaces.FightersItemClicked;
+import space.samatov.mmatoday.model.interfaces.NewsFeedItemClicked;
+import space.samatov.mmatoday.model.interfaces.OctagonGirlItemClicked;
+import space.samatov.mmatoday.model.interfaces.OctagonGirlsDataReceived;
+import space.samatov.mmatoday.model.interfaces.YouTubeThumbnailClicked;
+import space.samatov.mmatoday.model.interfaces.YoutubeVideoListLoaded;
 import space.samatov.mmatoday.model.YoutubeVideo;
 import space.samatov.mmatoday.model.YoutubeVideoReader;
 
-public class MainActivity extends AppCompatActivity implements  OnOctagonGirlItemClicked, OnOctagonGirlsDataReceived, OnYoutubeVideoListLoaded, OnYouTubeThumbnailClicked, OnNewsFeedItemClicked,
-        FighterReader.DataListener, OnListItemClicked, FighterReader.AllTimeDataListener,NewsReader.NewsFeedListener {
+public class MainActivity extends AppCompatActivity implements OctagonGirlItemClicked, OctagonGirlsDataReceived, YoutubeVideoListLoaded, YouTubeThumbnailClicked, NewsFeedItemClicked,
+        FighterReader.DataListener, FightersItemClicked, FighterReader.AllTimeDataListener,NewsFeedReceived {
+    private static final long RIPPLE_DURATION = 250;
     private FighterReader mFighterReader =new FighterReader();
     private NewsReader mNewsReader=new NewsReader();
     private Toolbar mToolbar;
     private YoutubeVideoReader mVideoReader=new YoutubeVideoReader();
     private OctagonGirlsReader mOctagonGirlsReader=OctagonGirlsReader.referenceActivity(this);
-
+    private FrameLayout mRootLayout;
     private int mCurrentMenuChoice=0;
+    private View mGuillotine;
+    private View mHamburgerButton;
+    private GuillotineAnimation.GuillotineBuilder mMenuAnimationBuilder;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mToolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(mToolbar);
-        startLoadingFragment();
 
-        subscribeToEvents();
-        if(mNewsReader.mNewsFeed==null||mNewsReader.mNewsFeed.size()<=0)
-        mNewsReader.getNewsFeed();
-        else
-            startNewsFragment();
+        setupMenu();
+        restoreActivityState(savedInstanceState);
+        if(isConnected()) {
+            if (mNewsReader.mNewsFeed == null || mNewsReader.mNewsFeed.size() <= 0) {
+                startLoadingFragment();
+                mNewsReader.getNewsFeed();
+            }
+        }
     }
 
-    public void subscribeToEvents(){
+    private void setupMenu(){
+        bindMenuNecessaryVariables();
+        setupMenuListeners();
+        setupMenuFont();
+    }
+
+    private void bindMenuNecessaryVariables(){
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        mRootLayout= (FrameLayout) findViewById(R.id.rootLayout);
+        mGuillotine= LayoutInflater.from(this).inflate(R.layout.guillotine,null);
+        mHamburgerButton=  findViewById(R.id.content_hamburger);
+
+    }
+
+    private void setupMenuListeners() {
+        mHamburgerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                setupGuillotineMenuAnimation();
+            }
+        });
+
+        View ufcFightersMenuItem=mGuillotine.findViewById(R.id.ufcFightersMenuItem);
+        ufcFightersMenuItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ufcFightersMenuItemClicked();
+            }
+        });
+
+        View allTimeMenuItem=mGuillotine.findViewById(R.id.allTimeRanksMenuItem);
+        allTimeMenuItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                allTimeRanksMenuItemClicked();
+            }
+        });
+
+        View newsMenuItem=mGuillotine.findViewById(R.id.newsMenuItem);
+        newsMenuItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                newsMenuItemClicked();
+            }
+        });
+
+        View octagonGirlsMenuItem=mGuillotine.findViewById(R.id.octagonGirlsMenuItem);
+        octagonGirlsMenuItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                octagonGirlsMenuItemClicked();
+            }
+        });
+    }
+
+    public void setupMenuFont(){
+        TextView title= (TextView) findViewById(R.id.titleTextView);
+       setFontForTextView(title);
+        TextView ufcFightersMenuItem= (TextView) mGuillotine.findViewById(R.id.ufcFightersMenuItem);
+        TextView allTimeMenuItem= (TextView) mGuillotine.findViewById(R.id.allTimeRanksMenuItem);
+        TextView newsMenuItem= (TextView) mGuillotine.findViewById(R.id.newsMenuItem);
+        TextView octagonGirlsMenuItem= (TextView) mGuillotine.findViewById(R.id.octagonGirlsMenuItem);
+        setFontForTextView(ufcFightersMenuItem);
+        setFontForTextView(allTimeMenuItem);
+        setFontForTextView(newsMenuItem);
+        setFontForTextView(octagonGirlsMenuItem);
+    }
+
+    public void setFontForTextView(TextView textView){
+        Typeface custom_font=Typeface.createFromAsset(getAssets(),"fonts/canaro_extra_bold.otf");
+        textView.setTypeface(custom_font);
+    }
+
+    private void setupGuillotineMenuAnimation(){
+        mRootLayout.addView(mGuillotine);
+        mMenuAnimationBuilder= new GuillotineAnimation.GuillotineBuilder(mGuillotine, mGuillotine.findViewById(R.id.guillotine_hamburger), mHamburgerButton)
+                .setStartDelay(RIPPLE_DURATION)
+                .setActionBarViewForAnimation(mToolbar);
+        mMenuAnimationBuilder.build();
+    }
+
+
+    public void closeGuillotineMenu(){
+        mMenuAnimationBuilder.setStartDelay(RIPPLE_DURATION).build().close();
+    }
+
+    public void restoreActivityState(Bundle savedInstanceState){
+        if(savedInstanceState!=null) {
+            mFighterReader.mUFCfighters = savedInstanceState.getParcelableArrayList(FighterReader.UFC_FIGHTERS_KEY);
+            mFighterReader.mAllTimeFighters = savedInstanceState.getParcelableArrayList(FighterReader.ALL_TIME_FIGHTERS_KEY);
+            mNewsReader.mNewsFeed = savedInstanceState.getParcelableArrayList(NewsReader.NEWS_FEED_KEY);
+            mVideoReader.mVideos = savedInstanceState.getParcelableArrayList(YoutubeVideoReader.YOUTUBE_VIDEOS_KEY);
+            mOctagonGirlsReader.mOctagonGirls = savedInstanceState.getParcelableArrayList(OctagonGirlsReader.OCT_GIRLS_KEY);
+        }
         mFighterReader.addListener(this);
         mFighterReader.addAllTimeRankListener(this);
         mNewsReader.addListener(this);
@@ -75,69 +178,13 @@ public class MainActivity extends AppCompatActivity implements  OnOctagonGirlIte
         mOctagonGirlsReader.addListener(this);
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_main, menu);
-
-        return true;
-    }
 
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int itemId = item.getItemId();
-        switch (itemId) {
-            case R.id.ufcFightersMenuItem: {
-                mCurrentMenuChoice=R.id.ufcFightersMenuItem;
-                if (isConnected()) {
-                    if(mFighterReader.mUFCfighters!=null&& mFighterReader.mUFCfighters.size()>0)
-                   startUFCListFragment();
-                    else
-                        mFighterReader.getFightersData();
-                }
-                else
-                    showNoConnectionMessage();
-                return true;
-            }
-            case R.id.allTimeRanksMenuItem: {
-                mCurrentMenuChoice=R.id.allTimeRanksMenuItem;
-                if (isConnected()) {
-                    if(mFighterReader.mAllTimeFighters!=null&& mFighterReader.mAllTimeFighters.size()>0)
-                        startAllTimeRankFragment();
-                    else if(mFighterReader.mUFCfighters!=null&& mFighterReader.mUFCfighters.size()>0)
-                        mFighterReader.readAllTimeRanks();
-                    else
-                        mFighterReader.getFightersData();
-                }
-                else
-                    showNoConnectionMessage();
-                return true;
-        }
-            case R.id.newsMenuItem:{
-                if(isConnected()){
-                    mCurrentMenuChoice=R.id.newsMenuItem;
-                    if((mNewsReader.mNewsFeed!=null&&mNewsReader.mNewsFeed.size()>0)&&(mVideoReader.mVideos!=null&&mVideoReader.mVideos.size()>0))
-                        startNewsFragment();
-                    if(mNewsReader.mNewsFeed==null||mNewsReader.mNewsFeed.size()<=0)
-                        mNewsReader.getNewsFeed();
-                }
-                else
-                    showNoConnectionMessage();
-            }
-
-            case R.id.octagonGirlsMenuItem:{
-                if(isConnected()){
-                    mCurrentMenuChoice=R.id.octagonGirlsMenuItem;
-                    if((mOctagonGirlsReader.mOctagonGirls!=null)&&(mOctagonGirlsReader.mOctagonGirls.size()>0))
-                        startOctagonGirlsRecyclerViewFragment();
-                    else
-                        mOctagonGirlsReader.getOctagonGirls();
-                }
-            }
-            default:
-                return super.onOptionsItemSelected(item);
-        }
+    public boolean checkIfListEmpty(List list){
+        if(list!=null&&list.size()>0)
+            return true;
+        else
+            return false;
     }
 
     public boolean isConnected() {
@@ -160,13 +207,17 @@ public class MainActivity extends AppCompatActivity implements  OnOctagonGirlIte
     }
 
     public void startUFCListFragment() {
-        UFCFightersViewPagerFragment UFCFightersViewPagerFragment = new UFCFightersViewPagerFragment();
-        startFragment(UFCFightersViewPagerFragment, mFighterReader.mUFCfighters,null,UFCFightersViewPagerFragment.ARGS_KEY,null, UFCFightersViewPagerFragment.FRAGMENT_KEY);
+        UFCFightersFragment UFCFightersFragment = new UFCFightersFragment();
+        startFragment(UFCFightersFragment, mFighterReader.mUFCfighters,null, UFCFightersFragment.ARGS_KEY,null, UFCFightersFragment.FRAGMENT_KEY);
+    }
+    public void startAllTimeListFragment(){
+        AllTimeRanksFragment fragment=new AllTimeRanksFragment();
+        startFragment(fragment, mFighterReader.mAllTimeFighters,null,AllTimeRanksFragment.ARGS_KEY,null,AllTimeRanksFragment.FRAGMENT_KEY);
     }
 
     private void startNewsFragment(){
-        NewsViewPagerFragment fragment=new NewsViewPagerFragment();
-        startFragment(fragment,mNewsReader.mNewsFeed,mVideoReader.mVideos,NewsfeedFragment.ARGS_KEY,YouTubeNewsFragment.ARGS_KEY,NewsfeedFragment.FRAGMENT_KEY);
+        NewsFragment fragment=new NewsFragment();
+        startFragment(fragment,mNewsReader.mNewsFeed,mVideoReader.mVideos, ArticlesFragment.ARGS_KEY,YouTubeNewsFragment.ARGS_KEY, NewsFragment.FRAGMENT_KEY);
     }
 
     public void startFighterDetailsFragment(Fighter fighter){
@@ -184,7 +235,7 @@ public class MainActivity extends AppCompatActivity implements  OnOctagonGirlIte
         startFragment(fragment,articleArrayList,null,ArticleDetailsFragment.ARGS_KEY,null,ArticleDetailsFragment.FRAGMENT_KEY);
     }
 
-    private void startOctagonGirlsRecyclerViewFragment(){
+    private void startOctagonGirlsListFragment(){
         OctagonGirlsRecyclerViewFragment fragment=new OctagonGirlsRecyclerViewFragment();
         startFragment(fragment,mOctagonGirlsReader.mOctagonGirls,null,OctagonGirlsRecyclerViewFragment.ARGS_KEY,null,OctagonGirlsRecyclerViewFragment.FRAGMENT_KEY);
     }
@@ -197,11 +248,11 @@ public class MainActivity extends AppCompatActivity implements  OnOctagonGirlIte
 
 
     @Override
-    public void onDataReceived() {
+    public void onFightersDataReceived() {
         if(mCurrentMenuChoice==R.id.ufcFightersMenuItem)
         startUFCListFragment();
         else if(mCurrentMenuChoice==R.id.allTimeRanksMenuItem)
-        mFighterReader.readAllTimeRanks();
+        mFighterReader.getAllTimeRanks();
     }
 
     @Override
@@ -210,19 +261,16 @@ public class MainActivity extends AppCompatActivity implements  OnOctagonGirlIte
     }
 
     @Override
-    public void OnListItemSelected(Fighter fighter) {
+    public void OnFighterListItemSelected(Fighter fighter) {
         startFighterDetailsFragment(fighter);
     }
 
     @Override
     public void OnAllTimeDataReceived(){
-       startAllTimeRankFragment();
+       startAllTimeListFragment();
     }
 
-    public void startAllTimeRankFragment(){
-        AllTimeRanksFragment fragment=new AllTimeRanksFragment();
-        startFragment(fragment, mFighterReader.mAllTimeFighters,null,AllTimeRanksFragment.ARGS_KEY,null,AllTimeRanksFragment.FRAGMENT_KEY);
-    }
+
 
     @Override
     public void OnNewsFeedReceived(){
@@ -236,12 +284,10 @@ public class MainActivity extends AppCompatActivity implements  OnOctagonGirlIte
     }
 
 
-
     @Override
     public void onYouTubeItemClicked(YoutubeVideo video) {
      startYouTubePlayer(video);
     }
-
 
 
     @Override
@@ -252,16 +298,13 @@ public class MainActivity extends AppCompatActivity implements  OnOctagonGirlIte
                 startNewsFragment();
             }
         });
-
     }
 
 
     @Override
     public void OnOctagonGirlsDataReceived() {
-        startOctagonGirlsRecyclerViewFragment();
+        startOctagonGirlsListFragment();
     }
-
-
 
 
     @Override
@@ -273,15 +316,9 @@ public class MainActivity extends AppCompatActivity implements  OnOctagonGirlIte
     }
 
 
-    public void startFragment(Fragment fragment, ArrayList args,ArrayList args2,String args_key,String args2_key, String fragment_key){
-        if(!(fragment instanceof LoadingFragment))
-            mToolbar.setVisibility(View.VISIBLE);
-        else
-            mToolbar.setVisibility(View.GONE);
-
-        FragmentManager fragmentManager=getSupportFragmentManager();
+    private void startFragment(final Fragment fragment, ArrayList args, ArrayList args2, String args_key, String args2_key, final String fragment_key){
+        final FragmentManager fragmentManager=getSupportFragmentManager();
         Fragment savedInstance=fragmentManager.findFragmentByTag(fragment_key);
-       // if(savedInstance==null) {
             Bundle bundle = new Bundle();
             bundle.putParcelableArrayList(args_key, args);
             if(args2!=null)
@@ -289,8 +326,128 @@ public class MainActivity extends AppCompatActivity implements  OnOctagonGirlIte
                 bundle.putParcelableArrayList(args2_key,args2);
             }
             fragment.setArguments(bundle);
-            fragmentManager.beginTransaction().replace(R.id.mainPlaceholder,fragment, fragment_key).addToBackStack(null).commit();
+        //if program was closed unexpectedly but activity is still callling commit
+        try {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if(!(fragment instanceof LoadingFragment)) {
+                        mToolbar.setVisibility(View.VISIBLE);
+                        LoadingFragment currentFragment=(LoadingFragment)getSupportFragmentManager().findFragmentByTag(LoadingFragment.FRAGMENT_KEY);
+
+                        // if current running fragment is not a loading fragment than add it to back stack , otherwise don't
+                        if(currentFragment==null)
+                            fragmentManager.beginTransaction().replace(R.id.mainPlaceholder,fragment, fragment_key).addToBackStack(null).commit();
+                        else
+                            fragmentManager.beginTransaction().replace(R.id.mainPlaceholder,fragment, fragment_key).commit();
+                    }
+                    else {
+                        mToolbar.setVisibility(View.GONE);
+                        fragmentManager.beginTransaction().replace(R.id.mainPlaceholder,fragment, fragment_key).commit();
+                    }
+                }
+            });
+        }
+        catch (IllegalStateException e){}
+    }
+
+
+    private void ufcFightersMenuItemClicked(){
+        if(isConnected()) {
+            mCurrentMenuChoice = R.id.ufcFightersMenuItem;
+           closeGuillotineMenu();
+            getUFCDataOrStartFragment();
+        }
+    }
+    private void getUFCDataOrStartFragment(){
+        boolean validList = checkIfListEmpty(mFighterReader.mUFCfighters);
+        if (validList)
+            startUFCListFragment();
+        else {
+            startLoadingFragment();
+            mFighterReader.getFightersData();
+        }
+    }
+
+    public void  allTimeRanksMenuItemClicked(){
+        if(isConnected()){
+            mCurrentMenuChoice=R.id.allTimeRanksMenuItem;
+           closeGuillotineMenu();
+            getAllTimeDataOrStartFragment();
+        }
+    }
+
+    private void getAllTimeDataOrStartFragment(){
+        boolean validUFCList=checkIfListEmpty(mFighterReader.mUFCfighters);
+        boolean validAllTimeList=checkIfListEmpty(mFighterReader.mAllTimeFighters);
+        if(validUFCList&&validAllTimeList)
+            startAllTimeListFragment();
+        else if(validUFCList)
+        {
+            startLoadingFragment();
+            mFighterReader.getAllTimeRanks();
+        }
+        else
+        {
+            startLoadingFragment();
+            mFighterReader.getFightersData();
+        }
+    }
+
+    private void newsMenuItemClicked(){
+        if(isConnected()) {
+           closeGuillotineMenu();
+            getNewsDataOrStartFragment();
+        }
+    }
+
+    private void getNewsDataOrStartFragment(){
+        mCurrentMenuChoice = R.id.newsMenuItem;
+        boolean validArticleList = checkIfListEmpty(mNewsReader.mNewsFeed);
+        boolean validVideoList = checkIfListEmpty(mVideoReader.mVideos);
+        if (validArticleList && validVideoList)
+            startNewsFragment();
+        else{
+            startLoadingFragment();
+            mNewsReader.getNewsFeed();
         }
 
-  //  }
+    }
+
+    private void octagonGirlsMenuItemClicked(){
+        if(isConnected()){
+          closeGuillotineMenu();
+            getOctagonGirlsDataOrStartFragment();
+        }
+    }
+
+    private void getOctagonGirlsDataOrStartFragment(){
+        mCurrentMenuChoice=R.id.octagonGirlsMenuItem;
+        boolean validGirlsList=checkIfListEmpty(mOctagonGirlsReader.mOctagonGirls);
+        if(validGirlsList)
+            startOctagonGirlsListFragment();
+        else
+            mOctagonGirlsReader.getOctagonGirls();
+    }
+
+
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        saveActivityData(outState,FighterReader.UFC_FIGHTERS_KEY,mFighterReader.mUFCfighters);
+        saveActivityData(outState,FighterReader.ALL_TIME_FIGHTERS_KEY,mFighterReader.mAllTimeFighters);
+        saveActivityData(outState,NewsReader.NEWS_FEED_KEY,mNewsReader.mNewsFeed);
+        saveActivityData(outState,YoutubeVideoReader.YOUTUBE_VIDEOS_KEY,mVideoReader.mVideos);
+        saveActivityData(outState,OctagonGirlsReader.OCT_GIRLS_KEY,mOctagonGirlsReader.mOctagonGirls);
+
+        super.onSaveInstanceState(outState);
+    }
+
+    private void saveActivityData(Bundle bundle, String key, ArrayList list){
+        if(list!=null){
+            bundle.putParcelableArrayList(key,list);
+        }
+    }
+
+
 }

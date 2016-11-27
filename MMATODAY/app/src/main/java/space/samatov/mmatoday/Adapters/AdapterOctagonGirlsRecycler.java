@@ -14,14 +14,14 @@ import java.util.ArrayList;
 
 import samatov.space.mmatoday.R;
 import space.samatov.mmatoday.model.OctagonGirl;
-import space.samatov.mmatoday.model.OnOctagonGirlItemClicked;
+import space.samatov.mmatoday.model.interfaces.OctagonGirlItemClicked;
 
 public class AdapterOctagonGirlsRecycler extends RecyclerView.Adapter {
 
     private ArrayList<OctagonGirl> mOctagonGirls;
-    private OnOctagonGirlItemClicked mListener;
+    private OctagonGirlItemClicked mListener;
 
-    public AdapterOctagonGirlsRecycler(ArrayList<OctagonGirl> octagonGirls,OnOctagonGirlItemClicked listener){
+    public AdapterOctagonGirlsRecycler(ArrayList<OctagonGirl> octagonGirls,OctagonGirlItemClicked listener){
         mOctagonGirls=octagonGirls;
         mListener=listener;
     }

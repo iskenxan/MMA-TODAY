@@ -4,7 +4,8 @@ package space.samatov.mmatoday.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
+
+import space.samatov.mmatoday.model.interfaces.ListItem;
 
 public class Sorter {
     public static final String FLYWEIGHT = "Flyweight";
@@ -183,19 +184,20 @@ public class Sorter {
         ArrayList<ListItem> listItems=new ArrayList<>();
         Fighter fighter1= (Fighter) list.get(0);
         Fighter champ=new Fighter();
-        ListGroupHeaders groupName=new ListGroupHeaders(fighter1.getLastName().charAt(0)+"");
+        LetterGroupHeader groupName=new LetterGroupHeader(fighter1.getLastName().charAt(0)+"");
         listItems.add(groupName);
         for (ListItem item:fighters){
             Fighter fighter= (Fighter) item;
-            String groupChar= fighter.getLastName().charAt(0)+"";
-            if(!groupName.getmGroupName().equals(groupChar)){
-                groupName=new ListGroupHeaders(fighter.getLastName().charAt(0)+"");
-                listItems.add(groupName);
-            }
             if(fighter.isTitleHolder())
                 champ=fighter;
-            else
-            listItems.add(fighter);
+            else {
+                String groupChar = fighter.getLastName().charAt(0) + "";
+                if (!groupName.getmGroupName().equals(groupChar)) {
+                    groupName = new LetterGroupHeader(fighter.getLastName().charAt(0) + "");
+                    listItems.add(groupName);
+                }
+                listItems.add(fighter);
+            }
         }
         listItems.add(0,champ);
         return listItems;

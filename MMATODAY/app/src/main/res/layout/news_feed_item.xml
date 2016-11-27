@@ -1,58 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     tools:background="@color/colorAccent"
-    android:paddingTop="20dp"
-    android:paddingBottom="15dp">
+  >
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:id="@+id/newsFeedImageView" />
+    <View
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@id/newsFeedImageView"
+        android:layout_alignBottom="@id/newsFeedImageView"
+        android:background="@drawable/primary_dark_bg"
+        android:alpha="0.2"/>
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="16dp"
-        tools:text="UFC 205: Gastelum misses weight, Cerrone fight scrapped"
-        android:paddingRight="10dp"
-        android:paddingLeft="10dp"
-        android:id="@+id/newsFeedTitle"
-        android:paddingBottom="4dp"
-        android:textStyle="bold"/>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <ImageView
-            android:layout_width="0dp"
-            android:layout_height="120dp"
-            android:layout_weight="1"
-            tools:src="@drawable/newsfeed_example"
-            android:id="@+id/newsFeedImageView"
-            android:layout_marginLeft="5dp"/>
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="14sp"
-                android:paddingLeft="5dp"
-                android:paddingRight="5dp"
-                android:id="@+id/newsFeedblurb"
-                tools:text="UFC president Dana White doesn’t expect Eddie Alvarez to want to trade strikes on the feet with Conor McGregor at UFC 205 this weekend."/>
-            <TextView
-                android:layout_marginTop="10dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                tools:text="by Nick Baldwin"
-                android:id="@+id/newsFeedAuthor"
-                android:paddingLeft="5dp"
-                android:paddingRight="5dp"/>
-        </LinearLayout>
-    </LinearLayout>
-
-</LinearLayout>
+        tools:text="Hello world,asdasdasdasdasdasdasdasdasdasdasd"
+        android:textSize="20sp"
+        android:layout_alignBottom="@id/newsFeedImageView"
+        android:textStyle="bold"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:textColor="@android:color/white"
+        android:id="@+id/newsFeedTitleTextView"
+        />
+</RelativeLayout>

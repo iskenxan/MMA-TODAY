@@ -1,6 +1,9 @@
 package space.samatov.mmatoday.model;
 
-public class FighterStats {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class FighterStats implements Parcelable {
 
     private long mFighterId;
     private String mFirst;
@@ -23,6 +26,9 @@ public class FighterStats {
     private String mProfDebut;
     private String mRank;
     private String mProfRecord;
+
+    public FighterStats(){}
+
 
     public String getmFirst() {
         return mFirst;
@@ -191,4 +197,69 @@ public class FighterStats {
     public void setmProfRecord(String mProfRecord) {
         this.mProfRecord = mProfRecord;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeLong(mFighterId);
+        parcel.writeString(mFirst);
+        parcel.writeString(mLast);
+        parcel.writeString(mFrom);
+        parcel.writeString(mFightsOutOf);
+        parcel.writeString(mHeight);
+        parcel.writeString(mAge);
+        parcel.writeString(mWeight);
+        parcel.writeString(mWeightClass);
+        parcel.writeString(mTeam);
+        parcel.writeString(mTakeDownsLanded);
+        parcel.writeString(mTakeDownAccuracy);
+        parcel.writeString(mTakeDownDefence);
+        parcel.writeString(mSubmissionAttempts);
+        parcel.writeString(mSigStrikesLanded);
+        parcel.writeString(mSigStrikesAccuracy);
+        parcel.writeString(mStrikesAbsorbed);
+        parcel.writeString(mSigStrikesDef);
+        parcel.writeString(mProfDebut);
+        parcel.writeString(mRank);
+        parcel.writeString(mProfRecord);
+    }
+    protected FighterStats(Parcel in) {
+        mFighterId = in.readLong();
+        mFirst = in.readString();
+        mLast = in.readString();
+        mFrom = in.readString();
+        mFightsOutOf = in.readString();
+        mHeight = in.readString();
+        mAge = in.readString();
+        mWeight = in.readString();
+        mWeightClass = in.readString();
+        mTeam = in.readString();
+        mTakeDownsLanded = in.readString();
+        mTakeDownAccuracy = in.readString();
+        mTakeDownDefence = in.readString();
+        mSubmissionAttempts = in.readString();
+        mSigStrikesLanded = in.readString();
+        mSigStrikesAccuracy = in.readString();
+        mStrikesAbsorbed = in.readString();
+        mSigStrikesDef = in.readString();
+        mProfDebut = in.readString();
+        mRank = in.readString();
+        mProfRecord = in.readString();
+    }
+
+    public static final Creator<FighterStats> CREATOR = new Creator<FighterStats>() {
+        @Override
+        public FighterStats createFromParcel(Parcel in) {
+            return new FighterStats(in);
+        }
+
+        @Override
+        public FighterStats[] newArray(int size) {
+            return new FighterStats[size];
+        }
+    };
 }

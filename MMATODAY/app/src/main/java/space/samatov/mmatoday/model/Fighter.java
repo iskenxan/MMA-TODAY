@@ -3,7 +3,7 @@ package space.samatov.mmatoday.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.util.regex.Matcher;
+import space.samatov.mmatoday.model.interfaces.ListItem;
 
 public class Fighter implements Parcelable,ListItem {
     private String mFirstName;

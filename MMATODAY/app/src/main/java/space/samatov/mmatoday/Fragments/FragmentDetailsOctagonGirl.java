@@ -18,9 +18,9 @@ import java.util.ArrayList;
 
 import samatov.space.mmatoday.R;
 import space.samatov.mmatoday.model.OctagonGirl;
-import space.samatov.mmatoday.model.OnGalleryButtonClicked;
+import space.samatov.mmatoday.model.interfaces.GalleryButtonClicked;
 
-public class FragmentDetailsOctagonGirl extends Fragment implements View.OnClickListener {
+public class FragmentDetailsOctagonGirl extends Fragment  {
     public static final String FRAGMENT_KEY="octagon_girls_details_fragment";
     public static final String ARGS_KEY="octagon_girl_details";
 
@@ -36,7 +36,6 @@ public class FragmentDetailsOctagonGirl extends Fragment implements View.OnClick
     private TextView mFoodTextView;
     private TextView mTwitterTextView;
     private ImageView mImageView;
-    private Button mGalleryButton;
 
     private LinearLayout mFromLayout;
     private LinearLayout mFoodLayout;
@@ -63,7 +62,6 @@ public class FragmentDetailsOctagonGirl extends Fragment implements View.OnClick
         mHobbiesLayout=(LinearLayout) view.findViewById(R.id.HobbiesLinearLayoutOctagonGirlsDetails);
         mFromLayout=(LinearLayout) view.findViewById(R.id.FromLinearLayoutOctagonGirlsDetails);
         mTwitterLayout=(LinearLayout) view.findViewById(R.id.TwitterUserNameLinearLayoutOctagonGirlsDetails);
-        mGalleryButton= (Button) view.findViewById(R.id.GalleryButtonOctagonGirlsDetails);
 
         Glide.with(getContext()).load(mGirl.getmBodyPic()).into(mImageView);
         mNameTextView.setText(mGirl.getmFirst()+" "+mGirl.getmLast());
@@ -71,7 +69,6 @@ public class FragmentDetailsOctagonGirl extends Fragment implements View.OnClick
         mBornTextView.setText(mGirl.getmBirthDate());
         mHeightTextView.setText(mGirl.getmHeight()+"");
         mWeightTextView.setText(mGirl.getmWeight()+"");
-        mGalleryButton.setOnClickListener(this);
 
         if(mGirl.getmCountry().isEmpty())
             mFromLayout.setVisibility(View.INVISIBLE);
@@ -93,8 +90,5 @@ public class FragmentDetailsOctagonGirl extends Fragment implements View.OnClick
     }
 
 
-    @Override
-    public void onClick(View view) {
-        ((OnGalleryButtonClicked)getActivity()).galleryButtonClicked(mGirl);
-    }
+
 }

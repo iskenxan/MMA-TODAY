@@ -15,13 +15,10 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-
 public  class FighterReader extends JsonReader {
+    public static final String UFC_FIGHTERS_KEY="ufc_fighters";
+    public static final String ALL_TIME_FIGHTERS_KEY="all_time_fighters";
+
     private static String mFightersUrl="http://ufc-data-api.ufc.com/api/v3/iphone/fighters";
     public static final String mFightMatrixSearchUrl="http://www.fightmatrix.com/fighter-search/?fName=";
     public static final String mMartialArtsSearchUrl="http://www.mixedmartialarts.com/fighter/search?search=";
@@ -268,7 +265,8 @@ public  class FighterReader extends JsonReader {
 
         public Bundle getFightMetricsData(String url,boolean isFirstTime) throws IOException {
              Bundle stats=new Bundle();
-              Document  document= (Document) Jsoup.connect(url).get();
+            String userAgent = System.getProperty("http.agent");
+              Document  document= (Document) Jsoup.connect(url).userAgent(userAgent).timeout(10*1000).get();
             Elements link=new Elements();
             if(!mCurrentDetailsFighter.getNickName().equals(""))
                 link=document.select("a:matchesOwn(^"+mCurrentDetailsFighter.getNickName()+"$)");
@@ -286,7 +284,7 @@ public  class FighterReader extends JsonReader {
                 }
                 String fighterUrl = link.get(0).attr("abs:href");
 
-                Document fighterPage = Jsoup.connect(fighterUrl).get();
+                Document fighterPage = Jsoup.connect(fighterUrl).userAgent(userAgent).timeout(10*1000).get();
 
                 Elements slpm = fighterPage.select("li:contains(SLpM:)");
                 stats.putString("slpm",slpm.text().replace("SLpM:", ""));
@@ -360,13 +358,15 @@ public  class FighterReader extends JsonReader {
     }
 
     public void readJsonData(String json){
+        Fighter fighter=new Fighter();
         try {
             mUFCfighters =new ArrayList<Fighter>();
+
             JSONArray jsonArray=new JSONArray(json);
             int length=jsonArray.length();
             for (int i=0;i<jsonArray.length();i++){
                 JSONObject jsonObject=jsonArray.getJSONObject(i);
-                Fighter fighter=new Fighter();
+                 fighter=new Fighter();
                 fighter.setFirstName(jsonObject.getString("first_name"));
                 fighter.setmIsUFC(true);
                 fighter.setLastName(jsonObject.getString("last_name"));
@@ -387,7 +387,13 @@ public  class FighterReader extends JsonReader {
                 catch (JSONException e) {
                     continue;
                 }
-                fighter.setProfileUrl(jsonObject.getString("profile_image"));
+
+                try {
+                    fighter.setProfileUrl(jsonObject.getString("profile_image"));
+                }
+                catch (JSONException e){
+                    fighter.setProfileUrl("default");
+                }
                 if(jsonObject.has("left_full_body_image"))
                     fighter.setFullBodyUrl(jsonObject.getString("left_full_body_image"));
                 else
@@ -407,17 +413,17 @@ public  class FighterReader extends JsonReader {
 
                 mUFCfighters.add(fighter);
             }
-            NotifyListeners(true);
+            notifyListeners(true);
         } catch (JSONException e) {
             Log.v("EXCEPTION",e.getMessage());
         }
     }
 
-    protected void  NotifyListeners(boolean sucess){
+    protected void notifyListeners(boolean sucess){
         if(sucess)
         {
             for (DataListener listener:mListeners){
-                listener.onDataReceived();
+                listener.onFightersDataReceived();
             }
         }
         else {
@@ -428,11 +434,11 @@ public  class FighterReader extends JsonReader {
     }
 
     public interface DataListener{
-        public void onDataReceived();
+        public void onFightersDataReceived();
         public void onDataFailed();
     }
 
-    public void readAllTimeRanks()
+    public void getAllTimeRanks()
     {
         AllTimeRanksJsoupReader reader=new AllTimeRanksJsoupReader();
         reader.execute();

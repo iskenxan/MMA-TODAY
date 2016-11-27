@@ -11,24 +11,28 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import space.samatov.mmatoday.model.interfaces.NewsFeedReceived;
+
 public class NewsReader {
+    public static final String NEWS_FEED_KEY="news_articles";
+
 
     public static final String mArticleUrl="http://www.bloodyelbow.com/ufc-news";
 
 
     public ArrayList<Article> mNewsFeed=new ArrayList<>();
 
-    public ArrayList<NewsFeedListener> mListeners=new ArrayList<>();
+    private ArrayList<NewsFeedReceived> mListeners=new ArrayList<>();
 
-    public void addListener(NewsFeedListener listener){
+    public void addListener(NewsFeedReceived listener){
         mListeners.add(listener);
     }
     public  void getNewsFeed(){
-        NewsFeedReader reader=new NewsFeedReader();
+        OnlineReader reader=new OnlineReader();
         reader.execute();
     }
 
-    private class NewsFeedReader extends AsyncTask<Void,Void,ArrayList<Article>>{
+    private class OnlineReader extends AsyncTask<Void,Void,ArrayList<Article>>{
 
 
         @Override
@@ -83,13 +87,9 @@ public class NewsReader {
     }
 
     public void notifyListeners(){
-        for(NewsFeedListener listener:mListeners){
+        for(NewsFeedReceived listener:mListeners){
             listener.OnNewsFeedReceived();
         }
     }
 
-
-    public interface  NewsFeedListener{
-        public void OnNewsFeedReceived();
-    }
 }

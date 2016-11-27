@@ -14,7 +14,7 @@ import android.widget.Spinner;
 import java.util.ArrayList;
 import samatov.space.mmatoday.R;
 import space.samatov.mmatoday.model.Fighter;
-import space.samatov.mmatoday.model.ListItem;
+import space.samatov.mmatoday.model.interfaces.ListItem;
 
 
 public abstract class List_Fragment extends android.support.v4.app.Fragment implements AdapterView.OnItemSelectedListener {
@@ -32,7 +32,7 @@ public abstract class List_Fragment extends android.support.v4.app.Fragment impl
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view= inflater.inflate(R.layout.fragment_list,container,false);
+        View view= inflater.inflate(R.layout.fragment_spinner_and_recycler,container,false);
 
         mFighters=getArguments().getParcelableArrayList("fighters");
         mCurrentFighters=new ArrayList<ListItem>();

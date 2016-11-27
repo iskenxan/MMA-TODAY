@@ -22,18 +22,18 @@ public abstract class JsonReader {
                     dataReceived(json,isFirstTime);
 
                 } else
-                    NotifyListeners(false);
+                    notifyListeners(false);
             }
 
             @Override
             public void onFailure(Call call, IOException e) {
-                NotifyListeners(false);
+                notifyListeners(false);
             }
         });
     }
 
     protected abstract void dataReceived(String json,boolean isFirstTime);
 
-    protected abstract void NotifyListeners(boolean b);
+    protected abstract void notifyListeners(boolean b);
 }
 

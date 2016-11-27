@@ -9,7 +9,6 @@
         android:layout_height="wrap_content"
         android:scaleType="fitCenter"
         android:adjustViewBounds="true"
-        tools:src="@drawable/octagon_girl"
         android:id="@+id/octagonGirlRecyclerImageView"/>
     <View
         android:layout_width="match_parent"

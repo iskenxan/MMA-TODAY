@@ -2,6 +2,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.example.ashley.mmatoday.MainActivity">
+    <!--
+    This menu is not used
     <item
         android:id="@+id/ufcFightersMenuItem"
         android:title="@string/action_ufc_fighters"
@@ -18,5 +20,5 @@
         android:id="@+id/octagonGirlsMenuItem"
         android:title="@string/octagon_girls"
         app:showAsAction="never" />
-
+   -->
 </menu>

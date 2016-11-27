@@ -6,8 +6,8 @@ import android.support.v7.widget.RecyclerView;
 import android.widget.ArrayAdapter;
 
 import samatov.space.mmatoday.R;
-import space.samatov.mmatoday.Adapters.FightersRecyclerViewAdapter;
-import space.samatov.mmatoday.model.OnListItemClicked;
+import space.samatov.mmatoday.Adapters.FightersAdapter;
+import space.samatov.mmatoday.model.interfaces.FightersItemClicked;
 import space.samatov.mmatoday.model.Sorter;
 
 public class MenListFragment extends List_Fragment {
@@ -17,7 +17,7 @@ public class MenListFragment extends List_Fragment {
     public void setupList() {
         mFighters= Sorter.getGender(Sorter.GENDER_MEN,mFighters);
         ArrayAdapter<CharSequence> spinnerAdapter=ArrayAdapter.createFromResource(getContext(),
-                R.array.men_weightclass_array, android.R.layout.simple_spinner_item);
+                R.array.men_weightclass_array, R.layout.custom_spinner_item);
         spinnerAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
         mSpinner.setAdapter(spinnerAdapter);
         mSpinner.setOnItemSelectedListener(this);
@@ -36,7 +36,7 @@ public class MenListFragment extends List_Fragment {
         RecyclerView.LayoutManager layoutManager=new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(layoutManager);
 
-        FightersRecyclerViewAdapter adapter=new FightersRecyclerViewAdapter(mCurrentFighters,(OnListItemClicked)getActivity(),true);
+        FightersAdapter adapter=new FightersAdapter(mCurrentFighters,(FightersItemClicked)getActivity(),true);
         mListeners.add(adapter);
         mRecyclerView.setAdapter(adapter);
     }

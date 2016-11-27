@@ -1,11 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_height="match_parent"
-    android:id="@+id/youtubeNewsLinearView">
+    android:layout_width="match_parent">
 
-    <android.support.v7.widget.RecyclerView
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical" android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/youtubeNewsLinearView">
+
+        <android.support.v7.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/youtubeRecyclerView"/>
+    </LinearLayout>
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/youtubeRecyclerView"/>
-</LinearLayout>
+        android:text="YouTube app not found on this device"
+        android:gravity="center"
+        android:textSize="18sp"
+        android:layout_centerVertical="true"
+        android:visibility="invisible"
+        android:id="@+id/youtubeErrorTextView"/>
+</RelativeLayout>
+
